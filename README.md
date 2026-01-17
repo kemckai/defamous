@@ -1,68 +1,132 @@
-# Facebook No-Celebrity Mode Browser Extension
+# Defamous
 
-A browser extension that filters out celebrity and public figure content from your Facebook feed, helping you focus on posts from friends, family, and personal connections.
+**Filter celebrity and public figure content from your Facebook feed**
 
-## Features
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-4285F4?style=for-the-badge&logo=Google-Chrome&logoColor=white)](https://chrome.google.com/webstore)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Privacy](https://img.shields.io/badge/Privacy-First-green.svg)](privacy-policy.html)
 
-- **Hide Verified Accounts**: Automatically hides posts from verified accounts (blue checkmark)
-- **Filter Public Figures**: Removes content from public figure pages
-- **Hide Brand Pages**: Filters out posts from brand and business pages
-- **High Engagement Filter**: Optionally hides posts with very high engagement (likes/comments/shares)
-- **Trending Content Filter**: Removes trending and viral content
-- **Customizable Settings**: Adjust all filters through the extension popup
-- **Real-time Filtering**: Works dynamically as you scroll through your feed
+Defamous is a privacy-focused browser extension that removes celebrity noise from Facebook. Instead of seeing verified accounts, public figures, and viral celebrity content, you'll see what matters: posts from your actual friends and family.
 
-## Installation
+## 🎯 Features
 
-### Chrome/Edge (Chromium-based browsers)
+- ✅ **Hide Verified Accounts** - Automatically detects and hides posts from verified accounts (blue checkmarks)
+- ✅ **Filter Public Figures** - Removes content from public figure pages and celebrity profiles
+- ✅ **Block Celebrity Pages & Groups** - Filters out posts shared from celebrity pages, fan pages, and celebrity-focused groups
+- ✅ **Smart Content Filtering** - Detects celebrity-related keywords and filters accordingly
+- ✅ **High Engagement Filter** - Optionally hides viral posts with high engagement
+- ✅ **Image Detection** - Filters posts containing celebrity images and photos
+- ✅ **Fully Customizable** - Every filter can be toggled on/off through the extension popup
+- ✅ **Real-Time Filtering** - Works dynamically as you scroll through your feed
 
-1. Download or clone this repository
-2. Open Chrome/Edge and navigate to `chrome://extensions/` (or `edge://extensions/`)
-3. Enable "Developer mode" (toggle in the top right)
-4. Click "Load unpacked"
-5. Select the folder containing the extension files
-6. The extension should now appear in your extensions list
+## 🔒 Privacy-First
 
-### Firefox
+- **No Data Collection** - The Extension does not collect, store, or transmit any personal data
+- **Everything Local** - All filtering happens entirely within your browser - no external servers
+- **No Tracking** - We don't use analytics, advertising, or any third-party tracking services
+- **Open Source** - The code is publicly available for transparency and review
 
-1. Download or clone this repository
-2. Open Firefox and navigate to `about:debugging`
-3. Click "This Firefox"
-4. Click "Load Temporary Add-on"
-5. Select the `manifest.json` file from the extension folder
+## 📦 Installation
 
-## Usage
+### From Source
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/kemckai/defamous.git
+   cd defamous
+   ```
+
+2. Load the extension in Chrome/Edge:
+   - Open Chrome/Edge and navigate to `chrome://extensions/` (or `edge://extensions/`)
+   - Enable "Developer mode" (toggle in the top right)
+   - Click "Load unpacked"
+   - Select the `defamous` folder
+
+3. Configure settings:
+   - Click the Defamous icon in your browser toolbar
+   - Adjust filter preferences as needed
+   - Refresh your Facebook feed to see filtered content
+
+### From Chrome Web Store (Coming Soon)
+
+Once published, you'll be able to install Defamous directly from the Chrome Web Store.
+
+## 🚀 Usage
 
 1. After installation, navigate to Facebook.com
-2. Click the extension icon in your browser toolbar
+2. Click the Defamous icon in your browser toolbar
 3. Configure your filtering preferences:
-   - Toggle filters on/off
+   - Toggle filters on/off individually
    - Adjust the engagement threshold (default: 10,000)
 4. Settings are saved automatically and apply immediately
 5. Refresh your Facebook feed to see filtered results
 
-## How It Works
+## ⚙️ How It Works
 
-The extension uses DOM manipulation to:
-- Detect verified account badges
-- Identify public figure and brand page indicators
-- Analyze post engagement metrics
-- Filter content based on your preferences
+Defamous uses intelligent detection to identify:
+- Verified accounts (blue checkmarks)
+- Public figures and celebrities (100+ celebrities in database)
+- Shared posts from celebrity pages/groups
+- High-engagement viral content
+- Celebrity-related keywords in posts
+- Celebrity images and photos
 
-## Limitations
+All filtering is done locally in real-time. Posts are hidden immediately as you browse - no page reload required.
+
+## 🎛️ Customization
+
+Click the Defamous icon in your browser toolbar to access settings:
+- **Hide Verified Accounts** - Toggle on/off
+- **Hide Public Figures** - Toggle on/off
+- **Hide Brand Pages** - Toggle on/off
+- **Hide Trending Content** - Toggle on/off
+- **Hide High Engagement Posts** - Toggle on/off
+- **Engagement Threshold** - Adjust the threshold for hiding high-engagement posts
+- **Hide Posts Shared from Pages** - Toggle on/off
+- **Hide Posts Shared from Groups** - Toggle on/off
+- **Filter Celebrity Content in Shared Posts** - Toggle on/off
+
+## 🔧 Technical Details
+
+### Permissions
+
+- **Storage**: Used to save filter preferences locally. No data is transmitted externally.
+- **Content Scripts**: Runs only on Facebook.com pages to filter content.
+
+### Browser Compatibility
+
+- ✅ Chrome (all recent versions)
+- ✅ Microsoft Edge (Chromium-based)
+- ✅ Works on Facebook.com web interface
+
+### Architecture
+
+- **Manifest V3** - Uses the latest Chrome extension manifest format
+- **Content Scripts** - Filters content through DOM manipulation
+- **Chrome Storage API** - Saves preferences locally
+- **No External Dependencies** - All code is self-contained
+
+## 📊 What Gets Filtered
+
+Defamous filters out:
+- ✅ Verified accounts (blue checkmarks)
+- ✅ Celebrity names (100+ celebrities in database)
+- ✅ Celebrity photos and images
+- ✅ Posts from celebrity pages
+- ✅ Shared posts from pages/groups
+- ✅ Celebrity-related keywords
+- ✅ High-engagement viral posts
+- ✅ Award shows and entertainment news
+- ✅ Influencer content
+
+## ⚠️ Limitations
 
 - **HTML Structure Dependency**: Facebook may change their HTML structure, which could break some filtering features
 - **Web Version Only**: Works on Facebook's web interface, not the mobile app
 - **No API Access**: Cannot access follower counts or detailed metrics directly
 - **Terms of Service**: Use at your own discretion; Facebook's ToS may prohibit modifications
 
-## Privacy
-
-- All filtering happens locally in your browser
-- No data is sent to external servers
-- Settings are stored locally in your browser's sync storage
-
-## Troubleshooting
+## 🐛 Troubleshooting
 
 **Extension not working?**
 - Refresh the Facebook page after installation
@@ -79,21 +143,42 @@ The extension uses DOM manipulation to:
 - Some posts may not match the filtering criteria
 - Try refreshing the page
 
-## Legal & Ethical Considerations
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+- Open an issue for bugs or feature requests
+- Submit a pull request with improvements
+- Help expand the celebrity database
+- Improve filtering algorithms
+
+## 📄 License
+
+This project is provided as-is for educational and personal use.
+
+## ⚖️ Legal & Ethical Considerations
 
 - This extension modifies the display of Facebook content but does not violate data access
 - Use responsibly and in accordance with Facebook's Terms of Service
 - The extension is for personal use and educational purposes
+- Not affiliated with, endorsed by, or connected to Facebook/Meta
 
-## Contributing
+## 📝 Privacy Policy
 
-Feel free to submit issues or pull requests to improve the extension.
+For detailed information about data handling, see our [Privacy Policy](privacy-policy.html).
 
-## License
+## 🙏 Acknowledgments
 
-This project is provided as-is for educational and personal use.
+- Built with privacy and user control in mind
+- Open source for transparency and community improvement
 
-## Disclaimer
+## 📞 Support
 
-This extension is not affiliated with, endorsed by, or connected to Facebook/Meta. Use at your own risk.
+For issues, questions, or suggestions:
+- Open an issue on [GitHub](https://github.com/kemckai/defamous/issues)
+- Check the [documentation](INSTALLATION.md) for detailed instructions
 
+---
+
+**Defamous** - *Filter the fame, focus on friends*
+
+Made with ❤️ for a better Facebook experience
