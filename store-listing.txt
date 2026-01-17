@@ -1,0 +1,161 @@
+================================================================================
+DEFAMOUS - CHROME WEB STORE LISTING
+================================================================================
+
+NAME:
+Defamous
+
+SUMMARY (132 characters max):
+Filter out celebrity content from your Facebook feed. Focus on posts from friends and family.
+
+================================================================================
+DESCRIPTION (16,000 characters max):
+================================================================================
+
+Defamous filters out celebrity and public figure content from your Facebook feed, helping you focus on posts from your real friends, family, and communities.
+
+🎯 WHAT IT DOES
+
+Defamous is a privacy-focused browser extension that removes celebrity noise from Facebook. Instead of seeing verified accounts, public figures, and viral celebrity content, you'll see what matters: posts from your actual friends and family.
+
+✨ KEY FEATURES
+
+• Hide Verified Accounts
+  Automatically detects and hides posts from verified accounts (blue checkmarks)
+
+• Filter Public Figures
+  Removes content from public figure pages and celebrity profiles
+
+• Block Celebrity Pages & Groups
+  Filters out posts shared from celebrity pages, fan pages, and celebrity-focused groups
+
+• Smart Content Filtering
+  Detects celebrity-related keywords and filters accordingly (award shows, red carpets, premieres, etc.)
+
+• High Engagement Filter
+  Optionally hides viral posts with high engagement that are likely celebrity-related
+
+• Fully Customizable
+  Every filter can be toggled on/off through the extension popup. Adjust settings to your preference
+
+• Real-Time Filtering
+  Works dynamically as you scroll through your feed
+
+🔒 PRIVACY-FIRST
+
+• No Data Collection
+  The Extension does not collect, store, or transmit any personal data
+
+• Everything Local
+  All filtering happens entirely within your browser - no external servers
+
+• No Tracking
+  We don't use analytics, advertising, or any third-party tracking services
+
+• Open Source
+  The code is publicly available for transparency and review
+
+⚙️ HOW IT WORKS
+
+Defamous uses intelligent detection to identify:
+- Verified accounts (blue checkmarks)
+- Public figures and celebrities
+- Shared posts from celebrity pages/groups
+- High-engagement viral content
+- Celebrity-related keywords in posts
+
+All filtering is done locally in real-time. Posts are hidden immediately as you browse - no page reload required.
+
+🎛️ CUSTOMIZATION
+
+Click the Defamous icon in your browser toolbar to access settings:
+- Toggle filters on/off individually
+- Adjust engagement threshold
+- Customize which types of content to hide
+
+Perfect for anyone who wants a more personal, less celebrity-focused Facebook experience.
+
+💡 USE CASES
+
+• Want to see more from friends and less from celebrities
+• Tired of viral celebrity content dominating your feed
+• Prefer authentic connections over influencer marketing
+• Want better control over what appears in your feed
+
+📱 COMPATIBILITY
+
+• Chrome (all recent versions)
+• Microsoft Edge (Chromium-based)
+• Works on facebook.com web interface
+
+⚠️ NOTE
+
+This extension works with Facebook's web interface. It filters content by detecting verified badges, celebrity names, and shared content patterns. As Facebook updates their interface, the extension may need updates.
+
+For best results, refresh your Facebook page after installation and enabling filters.
+
+🔗 TRANSPARENCY
+
+Defamous is open source. You can review the code, verify our privacy claims, and even contribute improvements.
+
+================================================================================
+CATEGORY:
+Social & Communication
+(Alternative: Productivity)
+
+================================================================================
+LANGUAGE:
+English (United States)
+
+================================================================================
+ICONS:
+- Use icon128.png for the store icon
+- All icons (16x16, 48x48, 128x128) are included in the package
+
+================================================================================
+SCREENSHOTS NEEDED:
+1. Main screenshot showing Facebook feed before/after filtering
+2. Extension popup with settings visible
+3. Before/after comparison of filtered posts
+4. Settings interface
+5. (Optional) Extension working on different Facebook pages
+
+Screenshot Requirements:
+- At least 1 screenshot required (up to 5)
+- Size: 1280x800 or 640x400 pixels
+- Format: PNG or JPEG
+- Should show the extension in action
+
+================================================================================
+PRIVACY POLICY URL:
+[You need to host privacy-policy.html on a website]
+Options:
+1. GitHub Pages (free) - Create a repo and enable Pages
+2. Your personal website
+3. Free hosting service (Netlify, Vercel, etc.)
+
+Once hosted, use that URL in the store listing.
+
+================================================================================
+SUPPORT URL (Optional):
+- GitHub repository URL (if you create one)
+- Or your website/contact page
+
+================================================================================
+WEBSITE (Optional):
+- Your personal website or project page
+
+================================================================================
+PROMOTIONAL TILES (Optional but recommended):
+- Small Promo Tile: 440x280 pixels
+- Marquee Promo Tile: 920x680 pixels
+
+================================================================================
+ADDITIONAL NOTES FOR SUBMISSION:
+- The extension requires "Storage" permission to save preferences
+- No background scripts are used
+- Content script only runs on facebook.com
+- Explain in "Justification" section: "Storage permission is used to save filter preferences locally. No data is transmitted externally."
+
+================================================================================
+
