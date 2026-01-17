@@ -17,3 +17,20 @@ Thumbs.db
 # Node modules (if you add build tools later)
 node_modules/
 
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Python virtual environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Temporary build directories
+defamous-package/
