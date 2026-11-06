@@ -17,6 +17,12 @@ Thumbs.db
 # Node modules (if you add build tools later)
 node_modules/
 
+# Playwright test outputs
+/playwright-report/
+/test-results/
+/blob-report/
+/.playwright/
+
 # Python cache files
 __pycache__/
 *.py[cod]
