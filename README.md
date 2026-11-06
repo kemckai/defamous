@@ -97,7 +97,43 @@ Click the Defamous icon in your browser toolbar to access settings:
 
 - ✅ Chrome (all recent versions)
 - ✅ Microsoft Edge (Chromium-based)
-- ✅ Works on Facebook.com web interface
+- ✅ Safari on macOS (as a Safari Web Extension — see below)
+- ✅ Works on the desktop Facebook.com web interface
+
+#### Safari on macOS
+
+The checked-in wrapper is `safari/Defamous/Defamous.xcodeproj` (app
+`com.kemckai.Defamous`, extension `com.kemckai.Defamous.Extension`). Build
+and enablement steps, including the difference between a per-session ad-hoc
+build and an Apple Development signature, are in [safari/BUILD.md](safari/BUILD.md).
+
+```bash
+safari/build-mac.sh --sync-only   # refresh the bundled web resources
+safari/build-mac.sh               # ad-hoc Debug build when no team is set
+```
+
+`safari/sync-extension-resources.sh` copies `manifest.json`, `content.js`,
+`popup.html`, `popup.js`, and the toolbar icons from the repository root
+into the extension bundle and removes anything else from that folder. The
+root files stay the source of truth.
+
+The manifest declares `host_permissions` for `*.facebook.com`, which Safari
+uses for the extension’s Websites list.
+
+An ad-hoc build loads only while Safari’s Develop → Allow Unsigned Extensions
+is on. That switch is per Safari session. Filtering has been confirmed in a
+current Safari session against Facebook; whether it is still enabled after
+Safari restarts has not been verified. A separate Apple Development Release
+build has been produced and was not installed. The installed app is the
+ad-hoc one.
+
+#### Safari on iOS / iPadOS
+
+The selectors in `content.js` target the desktop `www.facebook.com` DOM
+(`[role="article"]`, `[data-pagelet*="FeedUnit"]`, `div[role="feed"]`).
+Mobile Facebook (`m.facebook.com`) uses a different DOM and is not covered
+by the current selectors; filtering behavior on iPhone Safari against
+`m.facebook.com` is therefore not supported today.
 
 ### Architecture
 

@@ -1,0 +1,24 @@
+{
+  "name": "defamous-tests",
+  "version": "1.0.0",
+  "description": "WebKit + Chromium regression tests for the Defamous Facebook content-filter extension.",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/packaging/safari-packaging.test.js && playwright test",
+    "test:packaging": "node --test tests/packaging/safari-packaging.test.js",
+    "test:webkit": "playwright test --project=webkit",
+    "test:chromium": "playwright test --project=chromium"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kemckai/defamous.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kemckai/defamous/issues"
+  },
+  "homepage": "https://github.com/kemckai/defamous#readme",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.65.0"
+  }
+}

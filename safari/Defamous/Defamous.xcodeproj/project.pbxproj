@@ -1,0 +1,666 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04345251309E91EB00C49917 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04345250309E91EB00C49917 /* AppDelegate.swift */; };
+		04345255309E91EB00C49917 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 04345253309E91EB00C49917 /* Main.html */; };
+		04345257309E91EB00C49917 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 04345256309E91EB00C49917 /* Icon.png */; };
+		04345259309E91EB00C49917 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 04345258309E91EB00C49917 /* Style.css */; };
+		0434525B309E91EB00C49917 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 0434525A309E91EB00C49917 /* Script.js */; };
+		0434525D309E91EB00C49917 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0434525C309E91EB00C49917 /* ViewController.swift */; };
+		04345260309E91EB00C49917 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0434525E309E91EB00C49917 /* Main.storyboard */; };
+		04345262309E91ED00C49917 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04345261309E91ED00C49917 /* Assets.xcassets */; };
+		04345269309E91EE00C49917 /* Defamous Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 04345268309E91EE00C49917 /* Defamous Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0434526E309E91EE00C49917 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0434526D309E91EE00C49917 /* SafariWebExtensionHandler.swift */; };
+		04345292309E91F000C49917 /* icon16.png in Resources */ = {isa = PBXBuildFile; fileRef = 0434527A309E91F000C49917 /* icon16.png */; };
+		04345294309E91F000C49917 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 0434527C309E91F000C49917 /* popup.js */; };
+		04345297309E91F000C49917 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 0434527F309E91F000C49917 /* popup.html */; };
+		04345298309E91F000C49917 /* icon48.png in Resources */ = {isa = PBXBuildFile; fileRef = 04345280309E91F000C49917 /* icon48.png */; };
+		0434529D309E91F000C49917 /* icon128.png in Resources */ = {isa = PBXBuildFile; fileRef = 04345285309E91F000C49917 /* icon128.png */; };
+		043452A7309E91F000C49917 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 0434528F309E91F000C49917 /* manifest.json */; };
+		043452A9309E91F000C49917 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 04345291309E91F000C49917 /* content.js */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0434526A309E91EE00C49917 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04345245309E91EA00C49917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04345267309E91EE00C49917;
+			remoteInfo = "Defamous Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		04345275309E91EE00C49917 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				04345269309E91EE00C49917 /* Defamous Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0434524D309E91EA00C49917 /* Defamous.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Defamous.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		04345250309E91EB00C49917 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		04345254309E91EB00C49917 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		04345256309E91EB00C49917 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		04345258309E91EB00C49917 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		0434525A309E91EB00C49917 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		0434525C309E91EB00C49917 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		0434525F309E91EB00C49917 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		04345261309E91ED00C49917 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		04345263309E91ED00C49917 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04345268309E91EE00C49917 /* Defamous Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Defamous Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0434526D309E91EE00C49917 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		0434526F309E91EE00C49917 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1SIGN01309E91F000C49917 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		0434527A309E91F000C49917 /* icon16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon16.png; path = Resources/icon16.png; sourceTree = "<group>"; };
+		0434527C309E91F000C49917 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
+		0434527F309E91F000C49917 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		04345280309E91F000C49917 /* icon48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon48.png; path = Resources/icon48.png; sourceTree = "<group>"; };
+		04345285309E91F000C49917 /* icon128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon128.png; path = Resources/icon128.png; sourceTree = "<group>"; };
+		0434528F309E91F000C49917 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		04345291309E91F000C49917 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = Resources/content.js; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0434524A309E91EA00C49917 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04345265309E91EE00C49917 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		04345244309E91EA00C49917 = {
+			isa = PBXGroup;
+			children = (
+				A1SIGN01309E91F000C49917 /* Signing.xcconfig */,
+				0434524F309E91EA00C49917 /* Defamous */,
+				0434526C309E91EE00C49917 /* Defamous Extension */,
+				0434524E309E91EA00C49917 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0434524E309E91EA00C49917 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0434524D309E91EA00C49917 /* Defamous.app */,
+				04345268309E91EE00C49917 /* Defamous Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0434524F309E91EA00C49917 /* Defamous */ = {
+			isa = PBXGroup;
+			children = (
+				04345250309E91EB00C49917 /* AppDelegate.swift */,
+				0434525C309E91EB00C49917 /* ViewController.swift */,
+				0434525E309E91EB00C49917 /* Main.storyboard */,
+				04345261309E91ED00C49917 /* Assets.xcassets */,
+				04345263309E91ED00C49917 /* Info.plist */,
+				04345252309E91EB00C49917 /* Resources */,
+			);
+			path = Defamous;
+			sourceTree = "<group>";
+		};
+		04345252309E91EB00C49917 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				04345253309E91EB00C49917 /* Main.html */,
+				04345256309E91EB00C49917 /* Icon.png */,
+				04345258309E91EB00C49917 /* Style.css */,
+				0434525A309E91EB00C49917 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0434526C309E91EE00C49917 /* Defamous Extension */ = {
+			isa = PBXGroup;
+			children = (
+				04345279309E91F000C49917 /* Resources */,
+				0434526D309E91EE00C49917 /* SafariWebExtensionHandler.swift */,
+				0434526F309E91EE00C49917 /* Info.plist */,
+			);
+			path = "Defamous Extension";
+			sourceTree = "<group>";
+		};
+		04345279309E91F000C49917 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				04345291309E91F000C49917 /* content.js */,
+				0434527A309E91F000C49917 /* icon16.png */,
+				04345280309E91F000C49917 /* icon48.png */,
+				04345285309E91F000C49917 /* icon128.png */,
+				0434528F309E91F000C49917 /* manifest.json */,
+				0434527F309E91F000C49917 /* popup.html */,
+				0434527C309E91F000C49917 /* popup.js */,
+			);
+			name = Resources;
+			path = "Defamous Extension";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0434524C309E91EA00C49917 /* Defamous */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04345276309E91EE00C49917 /* Build configuration list for PBXNativeTarget "Defamous" */;
+			buildPhases = (
+				04345249309E91EA00C49917 /* Sources */,
+				0434524A309E91EA00C49917 /* Frameworks */,
+				0434524B309E91EA00C49917 /* Resources */,
+				04345275309E91EE00C49917 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0434526B309E91EE00C49917 /* PBXTargetDependency */,
+			);
+			name = Defamous;
+			packageProductDependencies = (
+			);
+			productName = Defamous;
+			productReference = 0434524D309E91EA00C49917 /* Defamous.app */;
+			productType = "com.apple.product-type.application";
+		};
+		04345267309E91EE00C49917 /* Defamous Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04345272309E91EE00C49917 /* Build configuration list for PBXNativeTarget "Defamous Extension" */;
+			buildPhases = (
+				A1SYNC01309E91F000C49917 /* Sync Extension Resources */,
+				04345264309E91EE00C49917 /* Sources */,
+				04345265309E91EE00C49917 /* Frameworks */,
+				04345266309E91EE00C49917 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Defamous Extension";
+			packageProductDependencies = (
+			);
+			productName = "Defamous Extension";
+			productReference = 04345268309E91EE00C49917 /* Defamous Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		04345245309E91EA00C49917 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					0434524C309E91EA00C49917 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					04345267309E91EE00C49917 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = 04345248309E91EA00C49917 /* Build configuration list for PBXProject "Defamous" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 04345244309E91EA00C49917;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0434524E309E91EA00C49917 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0434524C309E91EA00C49917 /* Defamous */,
+				04345267309E91EE00C49917 /* Defamous Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0434524B309E91EA00C49917 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04345257309E91EB00C49917 /* Icon.png in Resources */,
+				04345260309E91EB00C49917 /* Main.storyboard in Resources */,
+				0434525B309E91EB00C49917 /* Script.js in Resources */,
+				04345255309E91EB00C49917 /* Main.html in Resources */,
+				04345262309E91ED00C49917 /* Assets.xcassets in Resources */,
+				04345259309E91EB00C49917 /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04345266309E91EE00C49917 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				043452A9309E91F000C49917 /* content.js in Resources */,
+				04345292309E91F000C49917 /* icon16.png in Resources */,
+				04345298309E91F000C49917 /* icon48.png in Resources */,
+				0434529D309E91F000C49917 /* icon128.png in Resources */,
+				043452A7309E91F000C49917 /* manifest.json in Resources */,
+				04345297309E91F000C49917 /* popup.html in Resources */,
+				04345294309E91F000C49917 /* popup.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1SYNC01309E91F000C49917 /* Sync Extension Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../../content.js",
+				"$(SRCROOT)/../../icon128.png",
+				"$(SRCROOT)/../../icon16.png",
+				"$(SRCROOT)/../../icon48.png",
+				"$(SRCROOT)/../../manifest.json",
+				"$(SRCROOT)/../../popup.html",
+				"$(SRCROOT)/../../popup.js",
+				"$(SRCROOT)/../sync-extension-resources.sh",
+			);
+			name = "Sync Extension Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Defamous Extension/Resources/content.js",
+				"$(SRCROOT)/Defamous Extension/Resources/icon128.png",
+				"$(SRCROOT)/Defamous Extension/Resources/icon16.png",
+				"$(SRCROOT)/Defamous Extension/Resources/icon48.png",
+				"$(SRCROOT)/Defamous Extension/Resources/manifest.json",
+				"$(SRCROOT)/Defamous Extension/Resources/popup.html",
+				"$(SRCROOT)/Defamous Extension/Resources/popup.js",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "set -euo pipefail\n\"${SRCROOT}/../sync-extension-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		04345249309E91EA00C49917 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0434525D309E91EB00C49917 /* ViewController.swift in Sources */,
+				04345251309E91EB00C49917 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04345264309E91EE00C49917 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0434526E309E91EE00C49917 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0434526B309E91EE00C49917 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04345267309E91EE00C49917 /* Defamous Extension */;
+			targetProxy = 0434526A309E91EE00C49917 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		04345253309E91EB00C49917 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				04345254309E91EB00C49917 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		0434525E309E91EB00C49917 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0434525F309E91EB00C49917 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		04345270309E91EE00C49917 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1SIGN01309E91F000C49917 /* Signing.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		04345271309E91EE00C49917 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1SIGN01309E91F000C49917 /* Signing.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		04345273309E91EE00C49917 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Defamous Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Defamous Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kemckai.Defamous.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		04345274309E91EE00C49917 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Defamous Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Defamous Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kemckai.Defamous.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		04345277309E91EE00C49917 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Defamous/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Defamous;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kemckai.Defamous;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		04345278309E91EE00C49917 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Defamous/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Defamous;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kemckai.Defamous;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		04345248309E91EA00C49917 /* Build configuration list for PBXProject "Defamous" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04345270309E91EE00C49917 /* Debug */,
+				04345271309E91EE00C49917 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04345272309E91EE00C49917 /* Build configuration list for PBXNativeTarget "Defamous Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04345273309E91EE00C49917 /* Debug */,
+				04345274309E91EE00C49917 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04345276309E91EE00C49917 /* Build configuration list for PBXNativeTarget "Defamous" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04345277309E91EE00C49917 /* Debug */,
+				04345278309E91EE00C49917 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 04345245309E91EA00C49917 /* Project object */;
+}

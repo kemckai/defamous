@@ -1,0 +1,12 @@
+// Committed signing defaults for the Defamous macOS wrapper.
+// No team id, Apple ID, certificate, or provisioning profile belongs here.
+//
+// Copy Local.xcconfig.example to Local.xcconfig (gitignored) on a Mac
+// that should sign with an Apple Development identity. Command-line
+// xcodebuild settings from safari/build-mac.sh override this file.
+
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM =
+CODE_SIGN_IDENTITY =
+
+#include? "Local.xcconfig"

@@ -17,6 +17,12 @@ Thumbs.db
 # Node modules (if you add build tools later)
 node_modules/
 
+# Playwright test outputs
+/playwright-report/
+/test-results/
+/blob-report/
+/.playwright/
+
 # Python cache files
 __pycache__/
 *.py[cod]
@@ -34,3 +40,22 @@ venv.bak/
 
 # Temporary build directories
 defamous-package/
+
+# Xcode user state, build products, and local signing.
+# Team ids, Apple IDs, certificates, and profiles never belong in git.
+DerivedData/
+safari/DerivedData/
+safari/build/
+**/xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xcarchive
+*.app
+*.appex
+*.dSYM
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+safari/Defamous/Local.xcconfig
