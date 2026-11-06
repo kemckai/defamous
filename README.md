@@ -97,7 +97,31 @@ Click the Defamous icon in your browser toolbar to access settings:
 
 - ✅ Chrome (all recent versions)
 - ✅ Microsoft Edge (Chromium-based)
-- ✅ Works on Facebook.com web interface
+- ✅ Safari on macOS (as a Safari Web Extension — see below)
+- ✅ Works on the desktop Facebook.com web interface
+
+#### Safari on macOS
+
+The content-script filter logic is engine-portable and is exercised in WebKit
+by the test suite in `tests/` alongside Chromium. To ship it as a Safari Web
+Extension, run Apple's converter against this repo and open the resulting
+Xcode project:
+
+```bash
+xcrun safari-web-extension-converter /path/to/defamous
+```
+
+The manifest declares `host_permissions` for `*.facebook.com`, which Safari
+uses to show "Defamous" under Safari → Settings → Extensions → Websites so
+you can grant "Always Allow on Facebook".
+
+#### Safari on iOS / iPadOS
+
+The selectors in `content.js` target the desktop `www.facebook.com` DOM
+(`[role="article"]`, `[data-pagelet*="FeedUnit"]`, `div[role="feed"]`).
+Mobile Facebook (`m.facebook.com`) uses a different DOM and is not covered
+by the current selectors; filtering behavior on iPhone Safari against
+`m.facebook.com` is therefore not supported today.
 
 ### Architecture
 
