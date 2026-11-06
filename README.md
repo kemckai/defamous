@@ -102,18 +102,30 @@ Click the Defamous icon in your browser toolbar to access settings:
 
 #### Safari on macOS
 
-The content-script filter logic is engine-portable and is exercised in WebKit
-by the test suite in `tests/` alongside Chromium. To ship it as a Safari Web
-Extension, run Apple's converter against this repo and open the resulting
-Xcode project:
+The checked-in wrapper is `safari/Defamous/Defamous.xcodeproj` (app
+`com.kemckai.Defamous`, extension `com.kemckai.Defamous.Extension`). Build
+and enablement steps, including the difference between a per-session ad-hoc
+build and an Apple Development signature, are in [safari/BUILD.md](safari/BUILD.md).
 
 ```bash
-xcrun safari-web-extension-converter /path/to/defamous
+safari/build-mac.sh --sync-only   # refresh the bundled web resources
+safari/build-mac.sh               # ad-hoc Debug build when no team is set
 ```
 
+`safari/sync-extension-resources.sh` copies `manifest.json`, `content.js`,
+`popup.html`, `popup.js`, and the toolbar icons from the repository root
+into the extension bundle and removes anything else from that folder. The
+root files stay the source of truth.
+
 The manifest declares `host_permissions` for `*.facebook.com`, which Safari
-uses to show "Defamous" under Safari → Settings → Extensions → Websites so
-you can grant "Always Allow on Facebook".
+uses for the extension’s Websites list.
+
+An ad-hoc build loads only while Safari’s Develop → Allow Unsigned Extensions
+is on. That switch is per Safari session. Filtering has been confirmed in a
+current Safari session against Facebook; whether it is still enabled after
+Safari restarts has not been verified. A separate Apple Development Release
+build has been produced and was not installed. The installed app is the
+ad-hoc one.
 
 #### Safari on iOS / iPadOS
 

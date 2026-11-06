@@ -1,0 +1,11 @@
+// Copy to Local.xcconfig in this directory. Local.xcconfig is gitignored.
+// Fill in a team id only on your Mac. Do not commit the copy.
+//
+// DEVELOPMENT_TEAM = YOUR_TEAM_ID
+// CODE_SIGN_STYLE = Automatic
+// CODE_SIGN_IDENTITY = Apple Development
+//
+// Leave DEVELOPMENT_TEAM unset and run safari/build-mac.sh to produce an
+// ad-hoc (Sign to Run Locally) build instead. Ad-hoc builds load in Safari
+// only while Develop > Allow Unsigned Extensions is turned on. That switch
+// is a per-session development enablement, not a signed install.

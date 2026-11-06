@@ -4,7 +4,8 @@
   "description": "WebKit + Chromium regression tests for the Defamous Facebook content-filter extension.",
   "private": true,
   "scripts": {
-    "test": "playwright test",
+    "test": "node --test tests/packaging/safari-packaging.test.js && playwright test",
+    "test:packaging": "node --test tests/packaging/safari-packaging.test.js",
     "test:webkit": "playwright test --project=webkit",
     "test:chromium": "playwright test --project=chromium"
   },
