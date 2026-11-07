@@ -6,18 +6,16 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Privacy](https://img.shields.io/badge/Privacy-First-green.svg)](privacy-policy.html)
 
-Defamous is a privacy-focused browser extension that removes celebrity noise from Facebook. Instead of seeing verified accounts, public figures, and viral celebrity content, you'll see what matters: posts from your actual friends and family.
+Defamous is a privacy-focused browser extension that hides public figures from the Facebook feed, including posts about them and friends sharing those posts. Ordinary friend posts stay, including posts that are verified or widely liked.
 
 ## 🎯 Features
 
-- ✅ **Hide Verified Accounts** - Automatically detects and hides posts from verified accounts (blue checkmarks)
-- ✅ **Filter Public Figures** - Removes content from public figure pages and celebrity profiles
-- ✅ **Block Celebrity Pages & Groups** - Filters out posts shared from celebrity pages, fan pages, and celebrity-focused groups
-- ✅ **Smart Content Filtering** - Detects celebrity-related keywords and filters accordingly
-- ✅ **High Engagement Filter** - Optionally hides viral posts with high engagement
-- ✅ **Image Detection** - Filters posts containing celebrity images and photos
-- ✅ **Fully Customizable** - Every filter can be toggled on/off through the extension popup
-- ✅ **Real-Time Filtering** - Works dynamically as you scroll through your feed
+- ✅ **Hide known public figures** - Hides a post when its author matches a built-in name or a name you add
+- ✅ **Hide posts about them** - Hides captions, photo labels, and shares that name a public figure, including a friend passing the post along
+- ✅ **Facebook public-figure labels** - Hides a header whose category is exactly “Public figure”, “Actor”, “Musician”, “Athlete”, or a similar short page category
+- ✅ **Your own block list** - Extra names stay in browser storage on this device
+- ✅ **Optional extras, off by default** - Verified badges, high like counts, every Page, every Group, and Trending are not treated as fame unless you turn them on
+- ✅ **Real-time updates** - Rechecks the feed as Facebook inserts or recycles posts, and shows a post again when a rule no longer matches
 
 ## 🔒 Privacy-First
 
@@ -63,28 +61,31 @@ Once published, you'll be able to install Defamous directly from the Chrome Web 
 
 ## ⚙️ How It Works
 
-Defamous uses intelligent detection to identify:
-- Verified accounts (blue checkmarks)
-- Public figures and celebrities (100+ celebrities in database)
-- Shared posts from celebrity pages/groups
-- High-engagement viral content
-- Celebrity-related keywords in posts
-- Celebrity images and photos
+Defamous reads the post already on the page. It does not call Facebook, and it does not send the feed anywhere.
 
-All filtering is done locally in real-time. Posts are hidden immediately as you browse - no page reload required.
+A post is hidden when any of these is true:
+
+- The author, or the author of a shared attachment, matches a known public-figure name or a name you added. Matching uses the whole name, not a fragment, so “Smith” or “cook” in an ordinary sentence is not treated as “Will Smith” or “Tim Cook”.
+- The caption, photo alt text, accessible name, or shared attachment mentions one of those names, or a specific coverage phrase such as “red carpet” or “celebrity”.
+- A short header label is Facebook’s own category, such as “Public figure” or “Musician”.
+
+A blue checkmark, a large like count, a local Page, and a local Group do not hide a post unless you turn that extra rule on. The built-in name list is the list already in the extension. It is not a complete list of famous people, and a photo with no name in the text is not recognized.
 
 ## 🎛️ Customization
 
-Click the Defamous icon in your browser toolbar to access settings:
-- **Hide Verified Accounts** - Toggle on/off
-- **Hide Public Figures** - Toggle on/off
-- **Hide Brand Pages** - Toggle on/off
-- **Hide Trending Content** - Toggle on/off
-- **Hide High Engagement Posts** - Toggle on/off
-- **Engagement Threshold** - Adjust the threshold for hiding high-engagement posts
-- **Hide Posts Shared from Pages** - Toggle on/off
-- **Hide Posts Shared from Groups** - Toggle on/off
-- **Filter Celebrity Content in Shared Posts** - Toggle on/off
+Click the Defamous icon in your browser toolbar:
+
+- **Hide posts by known public figures** — on by default
+- **Hide posts and shares about them** — on by default
+- **Hide Facebook “Public figure” labels** — on by default
+- **Extra names to block** — blank by default, stored only in this browser
+- **Hide every verified account** — off by default
+- **Hide high-engagement posts** and the engagement threshold — off by default
+- **Hide every post shared from a Page** — off by default
+- **Hide every post shared from a Group** — off by default
+- **Hide posts marked Trending** — off by default
+
+Turning a rule off puts matching posts back. A previously saved setting is kept, so an older “hide verified accounts” choice stays on until you turn it off.
 
 ## 🔧 Technical Details
 
@@ -144,23 +145,29 @@ by the current selectors; filtering behavior on iPhone Safari against
 
 ## 📊 What Gets Filtered
 
-Defamous filters out:
-- ✅ Verified accounts (blue checkmarks)
-- ✅ Celebrity names (100+ celebrities in database)
-- ✅ Celebrity photos and images
-- ✅ Posts from celebrity pages
-- ✅ Shared posts from pages/groups
-- ✅ Celebrity-related keywords
-- ✅ High-engagement viral posts
-- ✅ Award shows and entertainment news
-- ✅ Influencer content
+Defamous hides:
+
+- Posts authored by a name on the built-in list or your extra list
+- Posts and nested shares whose visible text or photo label names those people
+- Posts whose header category is a public-figure label
+- Coverage phrases such as “red carpet”, “paparazzi”, and “celebrity”
+
+It leaves visible, unless you opt in:
+
+- Ordinary friend posts, including ones with a verified badge or a large like count
+- A friend mentioning a celebrity only inside a comment
+- A shared local Page or Group that does not name a public figure
+- Sentences that merely contain “smith”, “cook”, “james”, or “Adelaide”
 
 ## ⚠️ Limitations
 
-- **HTML Structure Dependency**: Facebook may change their HTML structure, which could break some filtering features
-- **Web Version Only**: Works on Facebook's web interface, not the mobile app
-- **No API Access**: Cannot access follower counts or detailed metrics directly
-- **Terms of Service**: Use at your own discretion; Facebook's ToS may prohibit modifications
+- **Not a complete list of famous people.** Someone absent from the built-in list and from your extra names stays visible unless Facebook labels the header as a public figure.
+- **Single-word names collide.** “Adele”, “Prince”, or “Drake” also matches a friend who has that name. “Adelaide” does not match “Adele”.
+- **No face recognition.** A photo is hidden only when its alt text, title, or accessible name includes a matched name.
+- **Comments are not scanned.** A celebrity named only in a comment does not hide the post.
+- **HTML structure.** The feed scan uses `role="feed"`, `role="article"`, message text, and accessible labels. A Facebook markup change can miss posts.
+- **Desktop site.** Selectors target the desktop Facebook DOM, not the mobile site or the Facebook app.
+- **Verified and viral are optional.** Those signals are not fame by themselves.
 
 ## 🐛 Troubleshooting
 

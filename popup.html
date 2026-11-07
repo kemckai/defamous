@@ -11,136 +11,73 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       margin: 0;
     }
-    
-    h1 {
-      font-size: 18px;
-      margin: 0 0 16px 0;
-      color: #1877f2;
-    }
-    
-    .setting {
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    label {
-      font-size: 14px;
-      color: #333;
-      cursor: pointer;
-      flex: 1;
-    }
-    
-    .toggle {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background-color: #ccc;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    
-    .toggle.active {
-      background-color: #1877f2;
-    }
-    
-    .toggle::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background-color: white;
-      top: 2px;
-      left: 2px;
-      transition: transform 0.3s;
-    }
-    
-    .toggle.active::after {
-      transform: translateX(20px);
-    }
-    
-    input[type="number"] {
-      width: 80px;
-      padding: 6px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    
-    .info {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
-    
-    .status {
-      padding: 8px;
-      background-color: #e3f2fd;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #1976d2;
-      margin-top: 16px;
-    }
+    h1 { font-size: 18px; margin: 0 0 8px 0; color: #1877f2; }
+    h2 { font-size: 13px; margin: 16px 0 8px 0; color: #444; }
+    .setting { margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    label { font-size: 14px; color: #333; cursor: pointer; flex: 1; }
+    .toggle { position: relative; width: 44px; height: 24px; background-color: #ccc; border-radius: 12px; cursor: pointer; flex: 0 0 auto; }
+    .toggle.active { background-color: #1877f2; }
+    .toggle::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background-color: white; top: 2px; left: 2px; transition: transform 0.3s; }
+    .toggle.active::after { transform: translateX(20px); }
+    input[type="number"], textarea { width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: inherit; }
+    textarea { min-height: 64px; resize: vertical; }
+    .info { font-size: 12px; color: #666; margin: -6px 0 12px 0; }
+    .status { padding: 8px; background-color: #e3f2fd; border-radius: 4px; font-size: 12px; color: #1976d2; margin-top: 16px; }
   </style>
 </head>
 <body>
   <h1>Defamous</h1>
-  
+  <p class="info">Hides public figures, posts about them, and shares of those posts. A verified badge or a high like count is not treated as fame. Name matching misses people who are not listed and can collide with ordinary words.</p>
+
   <div class="setting">
-    <label for="hideVerified">Hide Verified Accounts</label>
+    <label for="hideKnown">Hide posts by known public figures</label>
+    <div class="toggle" id="toggleKnown"></div>
+  </div>
+  <div class="setting">
+    <label for="hideAbout">Hide posts and shares about them</label>
+    <div class="toggle" id="toggleAbout"></div>
+  </div>
+  <div class="setting">
+    <label for="hideLabels">Hide Facebook “Public figure” labels</label>
+    <div class="toggle" id="toggleLabels"></div>
+  </div>
+  <div class="info">Also matches Actor, Musician, Athlete, Politician, and similar short page categories in the header.</div>
+
+  <label for="blockedNames">Extra names to block</label>
+  <textarea id="blockedNames" placeholder="One name per line"></textarea>
+  <div class="info">Saved on this device only. Separate names with commas or new lines.</div>
+
+  <h2>Optional, off by default</h2>
+  <div class="setting">
+    <label for="hideVerified">Hide every verified account</label>
     <div class="toggle" id="toggleVerified"></div>
   </div>
-  
+  <div class="info">A verified badge is not proof of fame. Friends and local businesses can be verified.</div>
+
   <div class="setting">
-    <label for="hidePublicFigures">Hide Public Figures</label>
-    <div class="toggle" id="togglePublicFigures"></div>
-  </div>
-  
-  <div class="setting">
-    <label for="hideBrandPages">Hide Brand Pages</label>
-    <div class="toggle" id="toggleBrandPages"></div>
-  </div>
-  
-  <div class="setting">
-    <label for="hideTrending">Hide Trending Content</label>
-    <div class="toggle" id="toggleTrending"></div>
-  </div>
-  
-  <div class="setting">
-    <label for="hideHighEngagement">Hide High Engagement Posts</label>
+    <label for="hideHighEngagement">Hide high-engagement posts</label>
     <div class="toggle" id="toggleHighEngagement"></div>
   </div>
-  
+  <label for="engagementThreshold">Engagement threshold</label>
+  <input type="number" id="engagementThreshold" min="0" step="1000" value="10000">
+  <div class="info">Used only when high-engagement hiding is on. A popular friend post is not fame.</div>
+
   <div class="setting">
-    <label for="engagementThreshold">Engagement Threshold:</label>
-    <input type="number" id="engagementThreshold" min="0" step="1000" value="10000">
-  </div>
-  <div class="info">Posts with more than this many likes/comments/shares will be hidden</div>
-  
-  <hr style="margin: 16px 0; border: none; border-top: 1px solid #ddd;">
-  
-  <div class="setting">
-    <label for="hideSharedFromPages">Hide Posts Shared from Pages</label>
+    <label for="hideSharedFromPages">Hide every post shared from a Page</label>
     <div class="toggle" id="toggleSharedFromPages"></div>
   </div>
-  
   <div class="setting">
-    <label for="hideSharedFromGroups">Hide Posts Shared from Groups</label>
+    <label for="hideSharedFromGroups">Hide every post shared from a Group</label>
     <div class="toggle" id="toggleSharedFromGroups"></div>
   </div>
-  
+  <div class="info">These remove local businesses and groups, not only famous people.</div>
+
   <div class="setting">
-    <label for="filterSharedCelebrityContent">Filter Celebrity Content in Shared Posts</label>
-    <div class="toggle" id="toggleSharedCelebrityContent"></div>
+    <label for="hideTrending">Hide posts marked Trending</label>
+    <div class="toggle" id="toggleTrending"></div>
   </div>
-  <div class="info">Hides shared posts that contain celebrity-related content, even if shared by friends</div>
-  
+
   <div class="status" id="status">Settings saved automatically</div>
-  
   <script src="popup.js"></script>
 </body>
 </html>
-
