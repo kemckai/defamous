@@ -1,13 +1,6 @@
-// Regression tests for content.js filter behavior.
-//
-// The same scenarios run in WebKit (Safari engine) and Chromium.
-// Playwright cannot load a real Safari web extension, so the tests
-// inject the same content.js via <script> on a static mock-Facebook
-// page and shim the chrome.* API that the script depends on.
-//
-// These are automated engine-level checks. They do NOT replace manual
-// verification on a real Apple device (Safari on macOS / iOS) against
-// authenticated live Facebook, which is listed in the PR description.
+// Filter behavior in WebKit (Safari's engine) and Chromium.
+// The page is a mock Facebook DOM. It is not a logged-in Facebook session,
+// and Playwright is not Safari on a Mac.
 
 const { test, expect } = require('@playwright/test');
 
@@ -15,101 +8,189 @@ async function isHidden(page, testid) {
   return await page.evaluate((id) => {
     const el = document.querySelector(`[data-testid="${id}"]`);
     if (!el) return 'missing';
-    return (
-      el.getAttribute('data-filtered-by') === 'defamous' ||
-      el.style.display === 'none' ||
-      el.getAttribute('aria-hidden') === 'true'
-    );
+    return el.getAttribute('data-filtered-by') === 'defamous';
   }, testid);
 }
 
-async function waitForFilterPass(page) {
-  // content.js runs an initial pass plus setTimeout passes at 1s and
-  // 3s. Wait past the first delayed pass so dynamic additions settle.
-  await page.waitForFunction(
-    () => document.querySelector('[data-filtered-by="defamous"]') !== null,
-    null,
-    { timeout: 5000 }
-  );
-  // Allow a microtask tick for any pending mutations.
-  await page.waitForTimeout(100);
+async function waitReady(page) {
+  await page.waitForFunction(() => document.documentElement.dataset.defamousReady);
 }
 
-test.describe('content.js filter behavior', () => {
-  test('hides celebrity, verified, shared-from-page, high-engagement, and keyword posts; keeps plain friend post', async ({ page }) => {
-    const consoleErrors = [];
-    page.on('pageerror', (err) => consoleErrors.push(String(err)));
-    page.on('console', (msg) => {
-      if (msg.type() === 'error') consoleErrors.push(msg.text());
-    });
+async function waitHidden(page, testid, hidden) {
+  await page.waitForFunction(({ id, want }) => {
+    const el = document.querySelector(`[data-testid="${id}"]`);
+    if (!el) return false;
+    return (el.getAttribute('data-filtered-by') === 'defamous') === want;
+  }, { id: testid, want: hidden });
+}
+
+test.describe('public-figure filter', () => {
+  test('hides authors, subjects, shares, photos, and labels; keeps ordinary posts', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (err) => errors.push(String(err)));
 
     await page.goto('/tests/fixtures/feed.html');
-    await waitForFilterPass(page);
+    await waitReady(page);
 
-    expect(await isHidden(page, 'celebrity-named'), 'celebrity author').toBe(true);
-    expect(await isHidden(page, 'verified-aria'), 'verified badge via aria-label').toBe(true);
-    expect(await isHidden(page, 'shared-from-page'), 'shared from a Page').toBe(true);
-    expect(await isHidden(page, 'high-engagement'), 'engagement over threshold').toBe(true);
-    expect(await isHidden(page, 'celebrity-keyword'), 'celebrity keyword in body').toBe(true);
+    const hidden = [
+      'celebrity-author',
+      'about-celebrity',
+      'friend-named-adele',
+      'shared-celebrity',
+      'nested-share',
+      'photo-of-celebrity',
+      'public-figure-label',
+      'coverage-phrase',
+      'swap-target'
+    ];
+    for (const id of hidden) {
+      expect(await isHidden(page, id), id).toBe(true);
+    }
 
-    expect(await isHidden(page, 'friend-plain'), 'plain friend post must stay visible').toBe(false);
-
-    expect(consoleErrors, 'no page errors').toEqual([]);
+    const visible = [
+      'friend-plain',
+      'friend-high-engagement',
+      'friend-verified',
+      'friend-ordinary-words',
+      'friend-famous-recipe',
+      'comment-mention',
+      'bakery-page',
+      'neighborhood-group',
+      'block-target'
+    ];
+    for (const id of visible) {
+      expect(await isHidden(page, id), id).toBe(false);
+    }
+    expect(errors).toEqual([]);
   });
 
-  test('responds to settings changes without reload', async ({ page }) => {
+  test('defaults do not treat a badge or a like count as fame', async ({ page }) => {
+    await page.goto('/tests/fixtures/feed-defaults.html');
+    await waitHidden(page, 'default-celebrity', true);
+    expect(await isHidden(page, 'default-verified-friend')).toBe(false);
+    expect(await isHidden(page, 'default-popular-friend')).toBe(false);
+  });
+
+  test('filters a post inserted into a virtualized feed', async ({ page }) => {
     await page.goto('/tests/fixtures/feed.html');
-    await waitForFilterPass(page);
-
-    expect(await isHidden(page, 'high-engagement')).toBe(true);
-
-    // Raise the threshold above the mock post's engagement.
+    await waitReady(page);
     await page.evaluate(() => {
-      window.__defamousTestHooks.updateSettings({ engagementThreshold: 1000000 });
+      const article = document.createElement('div');
+      article.setAttribute('role', 'article');
+      article.dataset.testid = 'inserted-celebrity';
+      article.innerHTML = '<a role="link" href="https://www.facebook.com/drake"><span>Drake</span></a><div data-ad-preview="message">New single tonight.</div>';
+      document.getElementById('feed').appendChild(article);
     });
-    // storage.onChanged runs processFeed(); it cannot un-hide a post
-    // once hidden by this implementation (processedPosts cache +
-    // display:none is sticky). We assert the documented behavior so
-    // that any future change to re-evaluation is intentional.
-    await page.waitForTimeout(300);
-    expect(await isHidden(page, 'high-engagement')).toBe(true);
+    await waitHidden(page, 'inserted-celebrity', true);
   });
 
-  test('exposes storage API through the chrome.* namespace that the script calls', async ({ page }) => {
-    // Safari (WebKit) exposes both chrome.* and browser.* to web
-    // extensions. This asserts that content.js only reaches for
-    // surfaces that the Safari shim can provide.
+  test('rechecks a cell when virtualized content is replaced', async ({ page }) => {
     await page.goto('/tests/fixtures/feed.html');
-    const uses = await page.evaluate(async () => {
+    await waitHidden(page, 'swap-target', true);
+    await page.evaluate(() => {
+      const article = document.querySelector('[data-testid="swap-target"]');
+      article.innerHTML = '<a role="link" href="https://www.facebook.com/alex.doe"><span>Alex Doe</span></a><div data-ad-preview="message">Back from the hardware store with paint.</div>';
+    });
+    await waitHidden(page, 'swap-target', false);
+  });
+
+  test('hides a post when its message later names a public figure', async ({ page }) => {
+    await page.goto('/tests/fixtures/feed.html');
+    await waitHidden(page, 'friend-plain', false);
+    await page.evaluate(() => {
+      const message = document.querySelector('[data-testid="friend-plain"] [data-ad-preview="message"]');
+      message.textContent = 'Ran into Taylor Swift at the bookstore.';
+    });
+    await waitHidden(page, 'friend-plain', true);
+  });
+
+  test('applies rule changes to posts already on screen', async ({ page }) => {
+    await page.goto('/tests/fixtures/feed.html');
+    await waitHidden(page, 'about-celebrity', true);
+    await waitHidden(page, 'celebrity-author', true);
+
+    await page.evaluate(() => {
+      window.__defamousTestHooks.updateSettings({ hideAboutPublicFigures: false });
+    });
+    await waitHidden(page, 'about-celebrity', false);
+    expect(await isHidden(page, 'celebrity-author')).toBe(true);
+
+    await page.evaluate(() => {
+      window.__defamousTestHooks.updateSettings({ hideKnownPublicFigures: false });
+    });
+    await waitHidden(page, 'celebrity-author', false);
+
+    await page.evaluate(() => {
+      window.__defamousTestHooks.updateSettings({
+        hideKnownPublicFigures: true,
+        hideAboutPublicFigures: true
+      });
+    });
+    await waitHidden(page, 'celebrity-author', true);
+    await waitHidden(page, 'about-celebrity', true);
+  });
+
+  test('uses the local extra-name list and removes the block when cleared', async ({ page }) => {
+    await page.goto('/tests/fixtures/feed.html');
+    await waitHidden(page, 'block-target', false);
+    await page.evaluate(() => {
+      window.__defamousTestHooks.updateSettings({ blockedNames: 'Riley Quinn' });
+    });
+    await waitHidden(page, 'block-target', true);
+    await page.evaluate(() => {
+      window.__defamousTestHooks.updateSettings({ blockedNames: '' });
+    });
+    await waitHidden(page, 'block-target', false);
+  });
+
+  test('optional page and engagement switches are reversible', async ({ page }) => {
+    await page.goto('/tests/fixtures/feed.html');
+    await waitHidden(page, 'bakery-page', false);
+    await waitHidden(page, 'friend-high-engagement', false);
+    await waitHidden(page, 'friend-verified', false);
+
+    await page.evaluate(() => {
+      window.__defamousTestHooks.updateSettings({
+        hideSharedFromPages: true,
+        hideHighEngagement: true,
+        hideVerified: true,
+        engagementThreshold: 10000
+      });
+    });
+    await waitHidden(page, 'bakery-page', true);
+    await waitHidden(page, 'friend-high-engagement', true);
+    await waitHidden(page, 'friend-verified', true);
+
+    await page.evaluate(() => {
+      window.__defamousTestHooks.updateSettings({
+        hideSharedFromPages: false,
+        hideHighEngagement: false,
+        hideVerified: false
+      });
+    });
+    await waitHidden(page, 'bakery-page', false);
+    await waitHidden(page, 'friend-high-engagement', false);
+    await waitHidden(page, 'friend-verified', false);
+  });
+
+  test('chrome.storage.sync.get returns a Promise', async ({ page }) => {
+    await page.goto('/tests/fixtures/feed.html');
+    const uses = await page.evaluate(() => {
+      const result = chrome.storage.sync.get('filterSettings');
       return {
-        hasChromeStorageSync: typeof chrome !== 'undefined' && !!(chrome.storage && chrome.storage.sync && chrome.storage.sync.get),
-        hasOnChanged: typeof chrome !== 'undefined' && !!(chrome.storage && chrome.storage.onChanged && chrome.storage.onChanged.addListener),
-        getIsPromise: (() => {
-          try {
-            const r = chrome.storage.sync.get('filterSettings');
-            return !!(r && typeof r.then === 'function');
-          } catch (_) {
-            return false;
-          }
-        })(),
+        hasGet: !!(chrome.storage && chrome.storage.sync && chrome.storage.sync.get),
+        hasOnChanged: !!(chrome.storage.onChanged && chrome.storage.onChanged.addListener),
+        getIsPromise: !!(result && typeof result.then === 'function')
       };
     });
-    expect(uses.hasChromeStorageSync).toBe(true);
-    expect(uses.hasOnChanged).toBe(true);
-    expect(uses.getIsPromise).toBe(true);
+    expect(uses).toEqual({ hasGet: true, hasOnChanged: true, getIsPromise: true });
   });
 });
 
 test.describe('manifest Safari compatibility', () => {
   test('manifest declares host_permissions for Facebook', async ({ request }) => {
-    // Safari Web Extensions in Manifest V3 require host_permissions to
-    // request access to a site. Having matches in content_scripts
-    // alone is honored by Chrome but less reliable in Safari, which
-    // presents the "Websites" list from host_permissions.
-    const resp = await request.get('/manifest.json');
-    const manifest = await resp.json();
+    const manifest = await (await request.get('/manifest.json')).json();
     expect(manifest.manifest_version).toBe(3);
-    expect(manifest.host_permissions, 'host_permissions should list facebook.com').toBeTruthy();
-    expect(manifest.host_permissions.some((p) => /facebook\.com/.test(p))).toBe(true);
+    expect(manifest.host_permissions.some((entry) => /facebook\.com/.test(entry))).toBe(true);
   });
 });

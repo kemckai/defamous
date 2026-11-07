@@ -5,138 +5,181 @@
   <title>mock facebook feed</title>
 </head>
 <body>
-  <div role="main" id="root">
+  <div role="main">
     <div role="feed" id="feed">
 
-      <!-- id: friend-plain
-           A regular friend post with no celebrity signal.
-           Expected: NOT hidden. -->
-      <div role="article" data-testid="friend-plain" data-ad-preview="message">
-        <div>
-          <a role="link" href="https://www.facebook.com/alex.doe">
-            <span dir="auto">Alex Doe</span>
-          </a>
+      <div role="article" data-testid="friend-plain">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/alex.doe"><span dir="auto">Alex Doe</span></a>
         </div>
-        <div>
-          <span dir="auto">Had a great weekend hiking with the family. Pancakes for breakfast!</span>
-        </div>
+        <div data-ad-preview="message"><span dir="auto">Had a great weekend hiking with the family. Pancakes for breakfast!</span></div>
         <div aria-label="12 Likes">12 Likes</div>
-        <div aria-label="3 comments">3 comments</div>
       </div>
 
-      <!-- id: celebrity-named
-           Author name matches a celebrity in the database.
-           Expected: hidden. -->
-      <div role="article" data-testid="celebrity-named" data-ad-preview="message">
-        <div>
-          <a role="link" href="https://www.facebook.com/TaylorSwift">
-            <span dir="auto">Taylor Swift</span>
-          </a>
+      <div role="article" data-testid="friend-high-engagement">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/robin.lee"><span>Robin Lee</span></a>
         </div>
-        <div>
-          <span dir="auto">New album out now. So grateful to the fans.</span>
-        </div>
+        <div data-ad-preview="message"><span>Our block party ran out of lemonade by noon. Photos later tonight.</span></div>
+        <div aria-label="25,000 Likes">25,000 Likes</div>
+        <div aria-label="1,200 comments">1,200 comments</div>
       </div>
 
-      <!-- id: verified-aria
-           Post whose author section has an aria-labelled verified badge.
-           Expected: hidden. -->
-      <div role="article" data-testid="verified-aria" data-ad-preview="message">
-        <div>
-          <a role="link" href="https://www.facebook.com/somepublicfigure">
-            <span dir="auto">Some Public Figure</span>
-          </a>
+      <div role="article" data-testid="friend-verified">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/sam.patel"><span>Sam Patel</span></a>
           <span aria-label="Verified account" role="img"></span>
         </div>
-        <div>
-          <span dir="auto">Thanks for the support, everyone. Behind the scenes update coming soon.</span>
+        <div data-ad-preview="message"><span>Thanks for the support, everyone. Behind the scenes update coming soon.</span></div>
+      </div>
+
+      <div role="article" data-testid="friend-ordinary-words">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/dana.wu"><span>Dana Wu</span></a>
+        </div>
+        <div data-ad-preview="message"><span>Dinner at the Smith house. I will cook tonight and James will visit Adelaide next week.</span></div>
+      </div>
+
+      <div role="article" data-testid="friend-famous-recipe">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/dana.wu"><span>Dana Wu</span></a>
+        </div>
+        <div data-ad-preview="message"><span>My famous pancake recipe won employee of the month at work.</span></div>
+      </div>
+
+      <div role="article" data-testid="celebrity-author">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/TaylorSwift"><span>Taylor Swift</span></a>
+        </div>
+        <div data-ad-preview="message"><span>New album out now. So grateful to the fans.</span></div>
+      </div>
+
+      <div role="article" data-testid="about-celebrity">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/sam.patel"><span>Sam Patel</span></a>
+        </div>
+        <div data-ad-preview="message"><span>Brunch with Taylor Swift after the show. Still cannot believe it.</span></div>
+      </div>
+
+      <div role="article" data-testid="friend-named-adele">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/mina.cho"><span>Mina Cho</span></a>
+        </div>
+        <div data-ad-preview="message"><span>My friend Adele from school baked a cake for the office.</span></div>
+      </div>
+
+      <div role="article" data-testid="comment-mention">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/alex.doe"><span>Alex Doe</span></a>
+        </div>
+        <div data-ad-preview="message"><span>The tomatoes in the garden finally turned red.</span></div>
+        <div data-comment-region aria-label="Comments">
+          <div>Taylor Swift is playing downtown this weekend.</div>
         </div>
       </div>
 
-      <!-- id: shared-from-page
-           A post that is shared from a Facebook Page and clearly labeled.
-           Expected: hidden under hideSharedFromPages=true. -->
-      <div role="article" data-testid="shared-from-page" data-ad-preview="message">
-        <div>
-          <a role="link" href="https://www.facebook.com/jamie.kim">
-            <span dir="auto">Jamie Kim</span>
-          </a>
-          <span dir="auto"> shared a post from </span>
-          <a role="link" href="https://www.facebook.com/pages/ExamplePage/123">
-            <span dir="auto">Example Page</span>
-          </a>
+      <div role="article" data-testid="shared-celebrity">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/jamie.kim"><span>Jamie Kim</span></a>
+          <span>shared a post</span>
         </div>
+        <div data-ad-preview="message"><span>Look at this.</span></div>
         <div role="article">
-          <div>
-            <span dir="auto">Weekly update from Example Page. Big announcements inside.</span>
+          <a role="link" href="https://www.facebook.com/TaylorSwift"><span>Taylor Swift</span></a>
+          <div data-ad-preview="message"><span>Rehearsal photos from tonight.</span></div>
+        </div>
+      </div>
+
+      <div role="article" data-testid="nested-share">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/alex.doe"><span>Alex Doe</span></a>
+          <span>shared a post</span>
+        </div>
+        <div data-ad-preview="message"><span>Passing this along.</span></div>
+        <div role="article">
+          <a role="link" href="https://www.facebook.com/jamie.kim"><span>Jamie Kim</span></a>
+          <div role="article">
+            <a role="link" href="https://www.facebook.com/beyonce"><span>Beyoncé</span></a>
+            <div data-ad-preview="message"><span>Tour dates are up.</span></div>
           </div>
         </div>
       </div>
 
-      <!-- id: high-engagement
-           A friend post that exceeds the engagement threshold.
-           Expected: hidden under hideHighEngagement with threshold 10,000. -->
-      <div role="article" data-testid="high-engagement" data-ad-preview="message">
-        <div>
-          <a role="link" href="https://www.facebook.com/robin.lee">
-            <span dir="auto">Robin Lee</span>
-          </a>
+      <div role="article" data-testid="photo-of-celebrity">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/robin.lee"><span>Robin Lee</span></a>
         </div>
-        <div>
-          <span dir="auto">A short caption that is still long enough to pass the 10-char filter.</span>
-        </div>
-        <div aria-label="25,000 Likes">25,000 Likes</div>
-        <div aria-label="1,200 comments">1,200 comments</div>
-        <div aria-label="500 shares">500 shares</div>
+        <div data-ad-preview="message"><span>From the concert last night.</span></div>
+        <img alt="Photo of Beyoncé on stage" src="/photo.jpg">
       </div>
 
-      <!-- id: celebrity-keyword
-           A friend post whose body text mentions celebrity keywords.
-           Expected: hidden under containsCelebrityContent. -->
-      <div role="article" data-testid="celebrity-keyword" data-ad-preview="message">
-        <div>
-          <a role="link" href="https://www.facebook.com/sam.patel">
-            <span dir="auto">Sam Patel</span>
-          </a>
+      <div role="article" data-testid="public-figure-label">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/jamie.alvarez"><span>Jamie Alvarez</span></a>
+          <span>Public figure</span>
         </div>
-        <div>
-          <span dir="auto">Just watched the red carpet coverage from the Oscars last night. So many celebrities!</span>
+        <div data-ad-preview="message"><span>Studio notes from this week. No names in the caption.</span></div>
+      </div>
+
+      <div role="article" data-testid="coverage-phrase">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/sam.patel"><span>Sam Patel</span></a>
+        </div>
+        <div data-ad-preview="message"><span>Just watched the red carpet coverage from last night.</span></div>
+      </div>
+
+      <div role="article" data-testid="bakery-page">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/jamie.kim"><span>Jamie Kim</span></a>
+          <span>shared a post</span>
+        </div>
+        <div data-ad-preview="message"><span>Support a neighborhood shop.</span></div>
+        <div role="article">
+          <a role="link" href="https://www.facebook.com/pages/ExampleBakery/123"><span>Example Bakery</span></a>
+          <div data-ad-preview="message"><span>Weekly bread menu for the local shop.</span></div>
         </div>
       </div>
 
-      <!-- id: friend-with-award-word
-           A friend post whose text mentions an award-shaped word in a benign
-           context (e.g. a coworker's performance "award"). This is a known
-           weakness of a keyword-based filter; we still assert the current
-           behavior so changes are intentional. -->
-      <div role="article" data-testid="friend-with-award-word" data-ad-preview="message">
-        <div>
-          <a role="link" href="https://www.facebook.com/dana.wu">
-            <span dir="auto">Dana Wu</span>
-          </a>
+      <div role="article" data-testid="neighborhood-group">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/alex.doe"><span>Alex Doe</span></a>
+          <span>shared a post</span>
         </div>
-        <div>
-          <span dir="auto">Congrats to my coworker on the employee-of-the-month recognition!</span>
+        <div role="article">
+          <a role="link" href="https://www.facebook.com/groups/oakstreet/"><span>Oak Street Neighbors</span></a>
+          <div data-ad-preview="message"><span>Free couch on the corner if anyone wants it.</span></div>
         </div>
+      </div>
+
+      <div role="article" data-testid="block-target">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/riley.quinn"><span>Riley Quinn</span></a>
+        </div>
+        <div data-ad-preview="message"><span>Office hours moved to Thursday this week.</span></div>
+      </div>
+
+      <div role="article" data-testid="swap-target">
+        <div data-author-header>
+          <a role="link" href="https://www.facebook.com/TaylorSwift"><span>Taylor Swift</span></a>
+        </div>
+        <div data-ad-preview="message"><span>Soundcheck complete.</span></div>
       </div>
 
     </div>
   </div>
-
   <script src="/tests/support/mock-chrome.js"></script>
   <script>
-    // Default settings mirror content.js defaults; tests may override
-    // via window.__defamousTestHooks before loading content.js.
     window.__defamousTestHooks.seedSettings({
-      hideVerified: true,
-      hidePublicFigures: true,
-      hideHighEngagement: true,
+      hideKnownPublicFigures: true,
+      hideAboutPublicFigures: true,
+      hidePublicFigureLabels: true,
+      blockedNames: '',
+      hideVerified: false,
+      hideHighEngagement: false,
       engagementThreshold: 10000,
-      hideBrandPages: true,
-      hideTrending: true,
-      hideSharedFromPages: true,
-      hideSharedFromGroups: true,
-      filterSharedCelebrityContent: true,
+      hideTrending: false,
+      hideSharedFromPages: false,
+      hideSharedFromGroups: false
     });
   </script>
   <script src="/content.js"></script>

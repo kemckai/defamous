@@ -1,463 +1,187 @@
-// Facebook No-Celebrity Mode - Content Script
-// Filters out verified accounts, public figures, and high-engagement content
+// Defamous content script.
+// Hides Facebook feed posts by or about public figures, including shares.
+// Runs only on the page. Nothing is sent off the device.
 
 class FacebookCelebrityFilter {
   constructor() {
     this.filterSettings = {
-      hideVerified: true,
-      hidePublicFigures: true,
-      hideHighEngagement: true,
+      hideKnownPublicFigures: true,
+      hideAboutPublicFigures: true,
+      hidePublicFigureLabels: true,
+      blockedNames: '',
+      hideVerified: false,
+      hideHighEngagement: false,
       engagementThreshold: 10000,
-      hideBrandPages: true,
-      hideTrending: true,
-      hideSharedFromPages: true,
-      hideSharedFromGroups: true,
-      filterSharedCelebrityContent: true
+      hideTrending: false,
+      hideSharedFromPages: false,
+      hideSharedFromGroups: false
     };
-    this.processedPosts = new Set();
+    this.generation = 0;
+    this.decisions = new WeakMap();
+    this.timer = null;
     this.observer = null;
-    this.celebrityNames = null; // Cache celebrity names
-    this.celebrityKeywords = null; // Cache keywords
+    this.knownNames = null;
+    this.coveragePhrases = null;
     this.init();
   }
 
   async init() {
-    // Load settings from storage
     await this.loadSettings();
-    
-    // Start filtering
-    this.startFiltering();
-    
-    // Set up mutation observer for dynamic content
-    this.setupObserver();
-    
-    // Listen for settings changes
-    chrome.storage.onChanged.addListener((changes) => {
-      if (changes.filterSettings) {
-        this.filterSettings = { ...this.filterSettings, ...changes.filterSettings.newValue };
-        this.processFeed();
-      }
-    });
+    this.observe();
+    this.processFeed();
+    window.addEventListener('scroll', () => this.schedule(), { passive: true });
+    setTimeout(() => this.schedule(), 1000);
+    setTimeout(() => this.schedule(), 3000);
   }
 
   async loadSettings() {
-    const result = await chrome.storage.sync.get('filterSettings');
-    if (result.filterSettings) {
-      this.filterSettings = { ...this.filterSettings, ...result.filterSettings };
+    try {
+      const result = await chrome.storage.sync.get('filterSettings');
+      this.applySettings(result && result.filterSettings);
+    } catch (e) {
+      this.applySettings(null);
+    }
+    if (chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener((changes) => {
+        if (changes.filterSettings) {
+          this.applySettings(changes.filterSettings.newValue);
+          this.processFeed();
+        }
+      });
     }
   }
 
-  setupObserver() {
-    // Watch for new posts being added to the feed
-    this.observer = new MutationObserver(() => {
-      this.processFeed();
-    });
+  applySettings(saved) {
+    const next = Object.assign({}, this.filterSettings, saved || {});
+    if (saved && saved.hidePublicFigures !== undefined && saved.hideKnownPublicFigures === undefined) {
+      next.hideKnownPublicFigures = saved.hidePublicFigures;
+    }
+    if (saved && saved.filterSharedCelebrityContent !== undefined && saved.hideAboutPublicFigures === undefined) {
+      next.hideAboutPublicFigures = saved.filterSharedCelebrityContent;
+    }
+    next.engagementThreshold = this.parseCount(next.engagementThreshold);
+    if (!Number.isFinite(next.engagementThreshold) || next.engagementThreshold < 0) {
+      next.engagementThreshold = 10000;
+    }
+    this.filterSettings = next;
+    this.generation += 1;
+  }
 
-    // Observe the main feed container
-    const feedContainer = document.querySelector('[role="main"]') || document.body;
-    this.observer.observe(feedContainer, {
+  observe() {
+    this.observer = new MutationObserver(() => this.schedule());
+    this.observer.observe(document.documentElement, {
       childList: true,
-      subtree: true
+      subtree: true,
+      characterData: true
     });
   }
 
-  startFiltering() {
-    // Process existing feed immediately
-    this.processFeed();
-    
-    // Process again after a short delay to catch late-loading content
-    setTimeout(() => this.processFeed(), 1000);
-    setTimeout(() => this.processFeed(), 3000);
-    
-    // Also process on scroll (Facebook loads content dynamically)
-    let scrollTimeout;
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        this.processFeed();
-      }, 300); // Faster response on scroll
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Process on any DOM changes (more aggressive)
-    const quickObserver = new MutationObserver(() => {
+  schedule() {
+    if (this.timer) return;
+    this.timer = setTimeout(() => {
+      this.timer = null;
       this.processFeed();
-    });
-    
-    // Observe the entire document for maximum coverage
-    quickObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    }, 50);
   }
 
   processFeed() {
-    // Find all post containers - try multiple selectors
-    let posts = document.querySelectorAll('[role="article"]');
-    
-    // If no posts found, try alternative selectors
-    if (posts.length === 0) {
-      posts = document.querySelectorAll('[data-pagelet*="FeedUnit"], div[data-ad-preview="message"]');
+    const posts = this.feedUnits();
+    for (let i = 0; i < posts.length; i++) {
+      const post = posts[i];
+      if (!post || post.nodeType !== 1) continue;
+      const sig = this.signature(post);
+      const prev = this.decisions.get(post);
+      if (prev && prev.sig === sig && prev.generation === this.generation) continue;
+      const hide = this.shouldFilterPost(post);
+      this.decisions.set(post, { sig: sig, generation: this.generation, hide: hide });
+      if (hide) this.hidePost(post);
+      else this.showPost(post);
     }
-    
-    // Also try Facebook's newer structure
-    if (posts.length === 0) {
-      posts = document.querySelectorAll('div[data-pagelet*="FeedUnit"], div[role="feed"] > div');
-    }
-    
-    posts.forEach(post => {
-      // Skip if already hidden
-      if (post.style.display === 'none' || post.getAttribute('data-filtered-by')) {
-        return;
-      }
-      
-      const postId = this.getPostId(post);
-      if (!postId) {
-        // Generate a temporary ID based on content
-        const tempId = post.textContent.substring(0, 50) + post.innerHTML.length;
-        if (this.processedPosts.has(tempId)) {
-          return;
-        }
-        this.processedPosts.add(tempId);
-      } else if (this.processedPosts.has(postId)) {
-        return;
-      } else {
-        this.processedPosts.add(postId);
-      }
-      
-      // Quick pre-check: if post is very small or empty, skip detailed filtering
-      const postText = post.textContent.trim();
-      if (postText.length < 10) {
-        return;
-      }
-      
-      if (this.shouldFilterPost(post)) {
-        this.hidePost(post);
-      }
-    });
+    document.documentElement.dataset.defamousReady = String(this.generation);
   }
 
-  getPostId(post) {
-    // Try to get a unique identifier for the post
-    const link = post.querySelector('a[href*="/posts/"], a[href*="/permalink/"]');
-    if (link) {
-      return link.href;
+  feedUnits() {
+    const feed = document.querySelector('[role="feed"]');
+    if (feed) {
+      const units = [];
+      for (let i = 0; i < feed.children.length; i++) {
+        const child = feed.children[i];
+        if (!child || child.nodeType !== 1) continue;
+        if (child.getAttribute('role') === 'article') {
+          units.push(child);
+          continue;
+        }
+        const nested = child.querySelector('[role="article"]');
+        units.push(nested || child);
+      }
+      if (units.length) return units;
     }
-    return post.getAttribute('data-pagelet') || post.id || null;
+    const articles = document.querySelectorAll('[role="article"]');
+    const top = [];
+    for (let i = 0; i < articles.length; i++) {
+      const article = articles[i];
+      const parentArticle = article.parentElement && article.parentElement.closest('[role="article"]');
+      if (!parentArticle) top.push(article);
+    }
+    if (top.length) return top;
+    return Array.prototype.slice.call(document.querySelectorAll('[data-pagelet*="FeedUnit"]'));
   }
 
-  getAuthorName(post) {
-    // Try multiple methods to get the author name
-    // Method 1: Look for author link in the post header (most reliable)
-    const authorLinks = post.querySelectorAll('a[role="link"][href*="/"], a[href*="facebook.com"]');
-    for (const authorLink of authorLinks) {
-      const text = authorLink.textContent.trim();
-      const href = (authorLink.getAttribute('href') || '').toLowerCase();
-      
-      // Skip if it's clearly not an author link
-      if (href.includes('/photos/') || href.includes('/videos/') || 
-          href.includes('/events/') || href.includes('/groups/')) {
-        continue;
-      }
-      
-      if (text && text.length > 1 && text.length < 100) {
-        // Check if it looks like a name (has capital letter, reasonable length)
-        if (/^[A-Z]/.test(text) || text.split(' ').length <= 4) {
-          return text;
-        }
-      }
-    }
-    
-    // Method 2: Look for strong/bold text in header (often author name)
-    const headers = post.querySelectorAll('[role="article"] > div > div, [data-pagelet], h2, h3');
-    for (const header of headers) {
-      const strong = header.querySelector('strong, b, span[dir="auto"]');
-      if (strong) {
-        const text = strong.textContent.trim();
-        if (text && text.length > 1 && text.length < 100 && /^[A-Z]/.test(text)) {
-          return text;
-        }
-      }
-    }
-    
-    // Method 3: Look for span with author name (Facebook's structure)
-    const spans = post.querySelectorAll('span[dir="auto"], span[role="link"]');
-    for (const span of spans) {
-      const text = span.textContent.trim();
-      if (text && text.length > 2 && text.length < 50) {
-        const parent = span.closest('a');
-        if (parent && parent.href.includes('facebook.com')) {
-          const href = parent.href.toLowerCase();
-          // Skip non-profile links
-          if (!href.includes('/photos/') && !href.includes('/videos/')) {
-            return text;
-          }
-        }
-      }
-    }
-    
-    // Method 4: Extract from URL if it's a profile/page link
-    const allLinks = post.querySelectorAll('a[href*="facebook.com"]');
-    for (const link of allLinks) {
-      const href = link.getAttribute('href') || '';
-      const urlMatch = href.match(/facebook\.com\/([^\/\?]+)/);
-      if (urlMatch) {
-        const username = urlMatch[1];
-        // If it's not a standard path like /posts, /photos, etc., might be a name
-        if (!username.match(/^(posts|photos|videos|events|groups|pages)/i)) {
-          const linkText = link.textContent.trim();
-          if (linkText && linkText.length < 100) {
-            return linkText;
-          }
-        }
-      }
-    }
-    
-    return null;
+  signature(post) {
+    const evidence = this.collectEvidence(post);
+    return [
+      evidence.names.join('\n'),
+      evidence.texts.join('\n'),
+      evidence.labels.join('\n'),
+      evidence.verified ? 'v' : '',
+      evidence.trending ? 't' : '',
+      evidence.pageShare ? 'p' : '',
+      evidence.groupShare ? 'g' : '',
+      String(evidence.engagement)
+    ].join('\u0001');
   }
 
   shouldFilterPost(post) {
-    // Get author name early for multiple checks
-    const authorName = this.getAuthorName(post);
-    
-    // Check for celebrity images/photos
-    if (this.hasCelebrityImages(post)) {
-      return true;
-    }
-    
-    // FIRST: Check if this is a shared post from a page/group (second-hand/third-hand content)
-    const sharedInfo = this.getSharedPostInfo(post);
-    if (sharedInfo.isShared) {
-      // Check if shared from a page
-      if (this.filterSettings.hideSharedFromPages && sharedInfo.isFromPage) {
-        return true;
-      }
-      
-      // Check if shared from a group
-      if (this.filterSettings.hideSharedFromGroups && sharedInfo.isFromGroup) {
-        return true;
-      }
-      
-      // Check the original source for celebrity content
-      if (this.filterSettings.filterSharedCelebrityContent) {
-        // Check original author name
-        if (sharedInfo.originalAuthor) {
-          const originalAuthorName = sharedInfo.originalAuthor.toLowerCase();
-          const celebrityNames = this.getCelebrityNames();
-          const normalizedName = originalAuthorName.replace(/[^a-z0-9]/g, '');
-          if (celebrityNames.some(celeb => {
-            const normalizedCeleb = celeb.replace(/[^a-z0-9]/g, '');
-            return normalizedName.includes(normalizedCeleb) || normalizedCeleb.includes(normalizedName);
-          })) {
-            return true;
-          }
-        }
-        
-        // Check shared content for celebrity keywords
-        if (sharedInfo.sharedContent) {
-          const sharedText = sharedInfo.sharedContent.toLowerCase();
-          if (this.containsCelebrityContent(sharedText)) {
-            return true;
-          }
-        }
-        
-        // Check if original source URL indicates a page/group
-        if (sharedInfo.originalUrl) {
-          const url = sharedInfo.originalUrl.toLowerCase();
-          if (url.includes('/pages/') || url.includes('/groups/') || url.includes('/pg/')) {
-            // It's from a page or group, filter it
-            return true;
-          }
-        }
-      }
-    }
-    
-    // Check for verified badge - multiple methods
-    if (this.filterSettings.hideVerified) {
-      // Method 1: aria-label
-      const verifiedBadge = post.querySelector('[aria-label*="Verified"], [aria-label*="verified"], [aria-label*="Checkmark"]');
-      if (verifiedBadge) {
-        return true;
-      }
-      
-      // Method 2: SVG checkmark icons (Facebook uses specific paths)
-      const svgCheckmarks = post.querySelectorAll('svg');
-      for (const svg of svgCheckmarks) {
-        const paths = svg.querySelectorAll('path');
-        for (const path of paths) {
-          const d = path.getAttribute('d') || '';
-          // Facebook's verified checkmark has distinctive path patterns
-          if (d.includes('M12') && d.includes('L8') && d.includes('L6')) {
-            return true;
-          }
-        }
-      }
-      
-      // Method 3: Look for verified badge in author section
-      const authorSection = post.querySelector('[role="article"] > div > div > div, [data-pagelet]');
-      if (authorSection) {
-        const authorHTML = authorSection.innerHTML.toLowerCase();
-        if (authorHTML.includes('verified') || authorHTML.includes('checkmark')) {
-          return true;
-        }
-      }
-      
-      // Method 4: Check for blue checkmark image/icon
-      const images = post.querySelectorAll('img[alt*="Verified"], img[alt*="verified"], img[alt*="Checkmark"]');
-      if (images.length > 0) {
-        return true;
-      }
-    }
+    const evidence = this.collectEvidence(post);
+    const names = this.matchNames();
+    const settings = this.filterSettings;
 
-    // Check author name against known celebrities
-    if (authorName) {
-      const celebrityNames = this.getCelebrityNames();
-      const normalizedName = authorName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (celebrityNames.some(celeb => {
-        const normalizedCeleb = celeb.replace(/[^a-z0-9]/g, '');
-        return normalizedName.includes(normalizedCeleb) || normalizedCeleb.includes(normalizedName);
-      })) {
-        return true;
-      }
+    if (settings.hideKnownPublicFigures && this.namesHit(evidence.names, names)) return true;
+    if (settings.hideAboutPublicFigures) {
+      if (this.namesHit(evidence.texts, names)) return true;
+      if (this.phrasesHit(evidence.texts, this.coveragePhrasesList())) return true;
     }
-
-    // Check for public figure indicators
-    if (this.filterSettings.hidePublicFigures) {
-      const authorLink = post.querySelector('a[href*="/"]');
-      if (authorLink) {
-        const authorText = authorLink.textContent.toLowerCase();
-        const publicFigureKeywords = ['official', 'fan page', 'public figure', 'verified page'];
-        if (publicFigureKeywords.some(keyword => authorText.includes(keyword))) {
-          return true;
-        }
-      }
-    }
-
-    // Check for high engagement (likes, comments, shares)
-    if (this.filterSettings.hideHighEngagement) {
-      const engagement = this.getPostEngagement(post);
-      if (engagement > this.filterSettings.engagementThreshold) {
-        return true;
-      }
-    }
-
-    // Check for brand pages and celebrity pages
-    if (this.filterSettings.hideBrandPages) {
-      const pageType = post.querySelector('[data-pagelet*="Page"]');
-      if (pageType) {
-        return true;
-      }
-      
-      // Check URLs for page indicators
-      const links = post.querySelectorAll('a[href*="facebook.com"]');
-      for (const link of links) {
-        const href = link.getAttribute('href') || '';
-        if (href.includes('/pages/') || href.includes('/pg/') || 
-            href.includes('/page/')) {
-          return true;
-        }
-      }
-    }
-
-    // Check for trending/viral content indicators
-    if (this.filterSettings.hideTrending) {
-      const trendingIndicators = post.querySelectorAll('[aria-label*="trending"], [aria-label*="Trending"]');
-      if (trendingIndicators.length > 0) {
-        return true;
-      }
-    }
-
-    // Check post content for celebrity-related keywords
-    const postText = post.textContent.toLowerCase();
-    if (this.containsCelebrityContent(postText)) {
-      return true;
-    }
-    
-    // Check all text content in the post (including hidden text)
-    const allText = post.innerText || post.textContent || '';
-    if (allText && this.containsCelebrityContent(allText.toLowerCase())) {
-      return true;
-    }
-    
-    // Check for celebrity names anywhere in the post HTML
-    const postHTML = post.innerHTML.toLowerCase();
-    const celebrityNames = this.getCelebrityNames();
-    for (const celeb of celebrityNames) {
-      const normalizedCeleb = celeb.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const normalizedHTML = postHTML.replace(/[^a-z0-9]/g, '');
-      if (normalizedHTML.includes(normalizedCeleb)) {
-        return true;
-      }
-    }
-
+    if (settings.hidePublicFigureLabels && evidence.labels.length > 0) return true;
+    if (settings.hideVerified && evidence.verified) return true;
+    if (settings.hideHighEngagement && evidence.engagement > settings.engagementThreshold) return true;
+    if (settings.hideTrending && evidence.trending) return true;
+    if (settings.hideSharedFromPages && evidence.pageShare) return true;
+    if (settings.hideSharedFromGroups && evidence.groupShare) return true;
     return false;
   }
 
-  hasCelebrityImages(post) {
-    // Check all images in the post for celebrity-related content
-    const images = post.querySelectorAll('img');
-    
-    for (const img of images) {
-      // Check alt text
-      const alt = (img.getAttribute('alt') || '').toLowerCase();
-      const src = (img.getAttribute('src') || '').toLowerCase();
-      const title = (img.getAttribute('title') || '').toLowerCase();
-      
-      // Combine all image text
-      const imageText = `${alt} ${src} ${title}`.toLowerCase();
-      
-      // Check for celebrity names in image attributes
-      const celebrityNames = this.getCelebrityNames();
-      for (const celeb of celebrityNames) {
-        const normalizedCeleb = celeb.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const normalizedText = imageText.replace(/[^a-z0-9]/g, '');
-        if (normalizedText.includes(normalizedCeleb) || normalizedCeleb.includes(normalizedText)) {
-          return true;
-        }
-      }
-      
-      // Check for celebrity-related keywords in image
-      const celebrityImageKeywords = [
-        'celebrity', 'star', 'famous', 'actor', 'actress', 'singer',
-        'red carpet', 'premiere', 'awards', 'hollywood', 'entertainment',
-        'verified', 'official page', 'fan page'
-      ];
-      
-      if (celebrityImageKeywords.some(keyword => imageText.includes(keyword))) {
-        return true;
-      }
-      
-      // Check if image is from a celebrity page URL
-      if (src.includes('/celebrity/') || src.includes('/stars/') || 
-          src.includes('/entertainment/') || src.includes('/hollywood/')) {
-        return true;
+  matchNames() {
+    const names = this.knownNameList().concat(this.blockedNameList());
+    const seen = Object.create(null);
+    const out = [];
+    for (let i = 0; i < names.length; i++) {
+      const variants = this.nameVariants(names[i]);
+      for (let j = 0; j < variants.length; j++) {
+        const variant = variants[j];
+        if (variant.length < 3 || seen[variant]) continue;
+        seen[variant] = true;
+        out.push(variant);
       }
     }
-    
-    // Check for profile pictures that might be celebrities
-    const profilePics = post.querySelectorAll('img[src*="profile"], img[src*="avatar"]');
-    for (const pic of profilePics) {
-      const parent = pic.closest('a');
-      if (parent) {
-        const href = (parent.getAttribute('href') || '').toLowerCase();
-        // If profile link suggests a page (not personal profile), might be celebrity
-        if (href.includes('/pages/') || href.includes('/pg/')) {
-          return true;
-        }
-      }
-    }
-    
-    return false;
+    return out;
   }
 
-  getCelebrityNames() {
-    // Cache celebrity names for performance
-    if (this.celebrityNames) {
-      return this.celebrityNames;
-    }
-    
-    this.celebrityNames = [
-      // A-List Actors
+  knownNameList() {
+    if (this.knownNames) return this.knownNames;
+    // Existing built-in list. Not expanded: a short name list cannot
+    // recognize every famous person, and substring matches were hiding
+    // ordinary posts ("smith", "cook", "james").
+    this.knownNames = [
       'ethan hawke', 'brad pitt', 'leonardo dicaprio', 'tom cruise', 'will smith',
       'jennifer aniston', 'angelina jolie', 'scarlett johansson', 'margot robbie',
       'dwayne johnson', 'chris hemsworth', 'robert downey', 'chris evans',
@@ -468,7 +192,6 @@ class FacebookCelebrityFilter {
       'al pacino', 'morgan freeman', 'samuel l jackson', 'keanu reeves',
       'gal gadot', 'zendaya', 'timothée chalamet', 'tom holland',
       'chris pine', 'henry cavill', 'jason momoa', 'idris elba',
-      // Musicians & Singers
       'taylor swift', 'beyonce', 'justin bieber', 'ariana grande',
       'drake', 'ed sheeran', 'bruno mars', 'adele', 'harry styles',
       'lady gaga', 'rihanna', 'kanye west', 'the weeknd', 'billie eilish',
@@ -476,263 +199,290 @@ class FacebookCelebrityFilter {
       'selena gomez', 'miley cyrus', 'dua lipa', 'olivia rodrigo',
       'the beatles', 'elvis presley', 'michael jackson', 'madonna',
       'prince', 'david bowie', 'bob dylan', 'bruce springsteen',
-      // Reality TV & Influencers
-      'kim kardashian', 'kanye west', 'kylie jenner', 'kendall jenner',
+      'kim kardashian', 'kylie jenner', 'kendall jenner',
       'khloe kardashian', 'kourtney kardashian', 'kris jenner',
       'charli damelio', 'addison rae', 'dixie damelio',
-      // Talk Show Hosts & TV Personalities
       'oprah', 'ellen degeneres', 'jimmy fallon', 'stephen colbert',
       'jimmy kimmel', 'seth meyers', 'trevor noah', 'james corden',
       'conan o\'brien', 'david letterman', 'jay leno',
-      // Sports Stars
       'lebron james', 'michael jordan', 'tom brady', 'serena williams',
       'cristiano ronaldo', 'lionel messi', 'kobe bryant', 'tiger woods',
       'roger federer', 'rafael nadal', 'stephen curry', 'kevin durant',
-      // Tech & Business Celebrities
       'elon musk', 'jeff bezos', 'mark zuckerberg', 'bill gates',
       'warren buffett', 'steve jobs', 'tim cook',
-      // Models
-      'gisele bundchen', 'kendall jenner', 'gigi hadid', 'bella hadid',
+      'gisele bundchen', 'gigi hadid', 'bella hadid',
       'karlie kloss', 'adriana lima', 'cara delevingne',
-      // Directors & Producers
       'steven spielberg', 'christopher nolan', 'quentin tarantino',
       'martin scorsese', 'james cameron', 'ridley scott',
-      // Comedians
       'kevin hart', 'dave chappelle', 'jerry seinfeld', 'chris rock',
       'amy schumer', 'tina fey', 'amy poehler', 'seth rogen',
-      // News Personalities
       'anderson cooper', 'rachel maddow', 'tucker carlson',
       'sean hannity', 'don lemon', 'chris cuomo'
     ];
-    
-    return this.celebrityNames;
+    return this.knownNames;
   }
 
-  containsCelebrityContent(text) {
-    // Cache keywords for performance
-    if (!this.celebrityKeywords) {
-      this.celebrityKeywords = [
-      // Awards & Events
-      'award show', 'red carpet', 'album release', 'movie premiere',
-      'grammy', 'oscar', 'emmy', 'golden globe', 'billboard',
-      'premiere', 'awards', 'nomination', 'cannes', 'venice film festival',
-      'met gala', 'coachella', 'vmas', 'amas', 'sag awards',
-      // Entertainment Industry
-      'hollywood', 'celebrity', 'star', 'famous', 'viral',
-      'celebrity news', 'entertainment news', 'breaking news',
-      'exclusive interview', 'entertainment industry', 'showbiz',
-      'tinseltown', 'a-list', 'red carpet event', 'after party',
-      // Social Media Celebrity Terms
-      'influencer', 'viral video', 'trending', 'went viral',
-      'million followers', 'instagram model', 'youtube star',
-      'tiktok star', 'social media star',
-      // Celebrity Lifestyle
-      'paparazzi', 'tabloid', 'gossip', 'rumor', 'scandal',
-      'celebrity couple', 'power couple', 'hollywood couple',
-      // Media Terms
-      'exclusive', 'breaking', 'sources say', 'insider',
-      'according to sources', 'reports say'
-      ];
-    }
-    
-    // Check for celebrity name patterns in text
-    const normalizedText = text.toLowerCase();
-    const celebrityNames = this.getCelebrityNames();
-    
-    // Check if any celebrity name appears in the text
-    for (const celeb of celebrityNames) {
-      const normalizedCeleb = celeb.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const textWords = normalizedText.split(/\s+/);
-      for (const word of textWords) {
-        const normalizedWord = word.replace(/[^a-z0-9]/g, '');
-        if (normalizedWord.length > 3 && (
-          normalizedWord.includes(normalizedCeleb) || 
-          normalizedCeleb.includes(normalizedWord)
-        )) {
-          return true;
-        }
-      }
-    }
-    
-    return this.celebrityKeywords.some(keyword => text.includes(keyword));
-  }
-
-  getSharedPostInfo(post) {
-    const info = {
-      isShared: false,
-      isFromPage: false,
-      isFromGroup: false,
-      originalAuthor: null,
-      originalUrl: null,
-      sharedContent: null
-    };
-
-    // Look for "shared" indicators in the post
-    const postHTML = post.innerHTML.toLowerCase();
-    const postText = post.textContent.toLowerCase();
-    
-    // Check for shared post indicators
-    const sharedIndicators = [
-      'shared a', 'shared from', 'shared by', 'shared with',
-      'shared this', 'shared post', 'shared from page',
-      'shared from group'
+  coveragePhrasesList() {
+    if (this.coveragePhrases) return this.coveragePhrases;
+    // Phrases that specifically describe celebrity coverage. Generic words
+    // ("famous", "star", "viral", "exclusive", "awards") are not used.
+    this.coveragePhrases = [
+      'red carpet',
+      'paparazzi',
+      'met gala',
+      'golden globe',
+      'golden globes',
+      'academy awards',
+      'the oscars',
+      'grammy awards',
+      'grammys',
+      'emmy awards',
+      'celebrity gossip',
+      'celebrity news',
+      'celebrity',
+      'celebrities'
     ];
-    
-    const hasSharedIndicator = sharedIndicators.some(indicator => 
-      postHTML.includes(indicator) || postText.includes(indicator)
-    );
-    
-    if (!hasSharedIndicator) {
-      // Also check for URL patterns that indicate sharing
-      const links = post.querySelectorAll('a[href*="/posts/"], a[href*="/permalink/"]');
-      for (const link of links) {
-        const href = link.href.toLowerCase();
-        if (href.includes('/pages/') || href.includes('/groups/') || href.includes('/pg/')) {
-          info.isShared = true;
-          info.originalUrl = link.href;
-          if (href.includes('/pages/') || href.includes('/pg/')) {
-            info.isFromPage = true;
-          }
-          if (href.includes('/groups/')) {
-            info.isFromGroup = true;
-          }
-          break;
-        }
-      }
-      return info;
-    }
-    
-    info.isShared = true;
-    
-    // Try to find the original source
-    // Look for links that might indicate the original source
-    const allLinks = post.querySelectorAll('a[href*="facebook.com"]');
-    for (const link of allLinks) {
-      const href = link.href.toLowerCase();
-      const linkText = link.textContent.trim();
-      
-      // Check if it's a page URL
-      if (href.includes('/pages/') || href.includes('/pg/')) {
-        info.isFromPage = true;
-        info.originalUrl = link.href;
-        if (linkText && linkText.length < 100) {
-          info.originalAuthor = linkText;
-        }
-      }
-      
-      // Check if it's a group URL
-      if (href.includes('/groups/')) {
-        info.isFromGroup = true;
-        info.originalUrl = link.href;
-        if (linkText && linkText.length < 100) {
-          info.originalAuthor = linkText;
-        }
-      }
-      
-      // Look for profile/page links that might be the original author
-      if (!info.originalAuthor && linkText && linkText.length > 2 && linkText.length < 50) {
-        // Could be the original author name
-        const parent = link.closest('div');
-        if (parent) {
-          const parentText = parent.textContent.toLowerCase();
-          if (parentText.includes('shared') || parentText.includes('from')) {
-            info.originalAuthor = linkText;
-          }
-        }
-      }
-    }
-    
-    // Extract shared content (the actual post content being shared)
-    // This is usually in a nested div or article
-    const sharedContentElements = post.querySelectorAll('[role="article"] > div > div, [data-pagelet] > div');
-    for (const elem of sharedContentElements) {
-      const elemText = elem.textContent.trim();
-      if (elemText.length > 50 && !info.sharedContent) {
-        // Likely the shared content
-        info.sharedContent = elemText;
-        break;
-      }
-    }
-    
-    // If we couldn't find shared content, use the full post text
-    if (!info.sharedContent) {
-      info.sharedContent = post.textContent;
-    }
-    
-    return info;
+    return this.coveragePhrases;
   }
 
-  getPostEngagement(post) {
-    // Try to extract engagement numbers from the post
-    let totalEngagement = 0;
-    
-    // Look for like counts
-    const likeElements = post.querySelectorAll('[aria-label*="like"], [aria-label*="Like"]');
-    likeElements.forEach(el => {
-      const text = el.getAttribute('aria-label') || el.textContent;
-      const match = text.match(/([\d,]+)\s*(?:like|people)/i);
-      if (match) {
-        totalEngagement += parseInt(match[1].replace(/,/g, ''), 10);
-      }
-    });
+  blockedNameList() {
+    const raw = this.filterSettings.blockedNames;
+    const parts = Array.isArray(raw) ? raw : String(raw || '').split(/[\n,]/);
+    const out = [];
+    for (let i = 0; i < parts.length; i++) {
+      const name = String(parts[i] || '').trim();
+      if (name.length >= 2 && name.length <= 80) out.push(name);
+    }
+    return out;
+  }
 
-    // Look for comment counts
-    const commentElements = post.querySelectorAll('[aria-label*="comment"], [aria-label*="Comment"]');
-    commentElements.forEach(el => {
-      const text = el.getAttribute('aria-label') || el.textContent;
-      const match = text.match(/([\d,]+)\s*(?:comment|people)/i);
-      if (match) {
-        totalEngagement += parseInt(match[1].replace(/,/g, ''), 10);
-      }
-    });
+  nameVariants(name) {
+    const folded = this.fold(name).replace(/\s+/g, ' ').trim();
+    const variants = [folded];
+    const withoutApostrophe = folded.replace(/['’]/g, '');
+    if (withoutApostrophe !== folded) variants.push(withoutApostrophe);
+    return variants;
+  }
 
-    // Look for share counts
-    const shareElements = post.querySelectorAll('[aria-label*="share"], [aria-label*="Share"]');
-    shareElements.forEach(el => {
-      const text = el.getAttribute('aria-label') || el.textContent;
-      const match = text.match(/([\d,]+)\s*(?:share|people)/i);
-      if (match) {
-        totalEngagement += parseInt(match[1].replace(/,/g, ''), 10);
+  namesHit(blobs, names) {
+    for (let i = 0; i < blobs.length; i++) {
+      const text = this.fold(blobs[i]);
+      for (let j = 0; j < names.length; j++) {
+        if (this.hasBoundedPhrase(text, names[j])) return true;
       }
-    });
+    }
+    return false;
+  }
 
-    return totalEngagement;
+  phrasesHit(blobs, phrases) {
+    for (let i = 0; i < blobs.length; i++) {
+      const text = this.fold(blobs[i]);
+      for (let j = 0; j < phrases.length; j++) {
+        if (this.hasBoundedPhrase(text, this.fold(phrases[j]))) return true;
+      }
+    }
+    return false;
+  }
+
+  hasBoundedPhrase(haystack, needle) {
+    if (!needle || needle.length < 3) return false;
+    let from = 0;
+    while (from <= haystack.length - needle.length) {
+      const at = haystack.indexOf(needle, from);
+      if (at === -1) return false;
+      const before = at === 0 ? '' : haystack.charAt(at - 1);
+      const after = haystack.charAt(at + needle.length);
+      if (this.isBoundary(before) && this.isBoundary(after)) return true;
+      from = at + 1;
+    }
+    return false;
+  }
+
+  isBoundary(ch) {
+    if (!ch) return true;
+    return !/[a-z0-9]/i.test(ch);
+  }
+
+  fold(value) {
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  }
+
+  collectEvidence(post) {
+    const evidence = {
+      names: [],
+      texts: [],
+      labels: [],
+      verified: false,
+      trending: false,
+      pageShare: false,
+      groupShare: false,
+      engagement: 0
+    };
+    const labelSet = this.publicFigureLabels();
+    const regions = [post];
+    const nested = post.querySelectorAll('[role="article"]');
+    for (let i = 0; i < nested.length; i++) regions.push(nested[i]);
+
+    for (let r = 0; r < regions.length; r++) {
+      const region = regions[r];
+      const messages = [];
+      const messageNodes = region.querySelectorAll('[data-ad-preview="message"]');
+      for (let i = 0; i < messageNodes.length; i++) {
+        const message = messageNodes[i];
+        if (message === region || this.inComment(message, post)) continue;
+        if (message.closest('[role="article"]') !== region && region !== post) continue;
+        messages.push(message);
+      }
+      if (messages.length) {
+        for (let i = 0; i < messages.length; i++) {
+          const text = this.cleanText(messages[i]);
+          if (text) evidence.texts.push(text);
+        }
+      } else {
+        const text = this.regionText(region);
+        if (text) evidence.texts.push(text);
+      }
+    }
+
+    const nodes = post.querySelectorAll('a, span, h1, h2, h3, h4, img, [aria-label], [role="img"]');
+    for (let i = 0; i < nodes.length; i++) {
+      const el = nodes[i];
+      if (el === post || this.inComment(el, post)) continue;
+      if (el.tagName === 'A') {
+        const text = this.cleanText(el);
+        const href = (el.getAttribute('href') || '').toLowerCase();
+        if (text && text.length <= 80 && !this.inMessage(el, post)) evidence.names.push(text);
+        if (text && text.length > 80 && !this.inMessage(el, post)) evidence.texts.push(text);
+        if (this.isPageHref(href) && !this.inMessage(el, post)) evidence.pageShare = true;
+        if (this.isGroupHref(href) && !this.inMessage(el, post)) evidence.groupShare = true;
+      }
+      if (el.tagName === 'IMG') {
+        const alt = el.getAttribute('alt');
+        const title = el.getAttribute('title');
+        if (alt) evidence.texts.push(alt);
+        if (title) evidence.texts.push(title);
+      }
+      const aria = el.getAttribute && el.getAttribute('aria-label');
+      if (aria && aria.length <= 240) {
+        evidence.texts.push(aria);
+        const short = aria.trim().toLowerCase();
+        if (short.length <= 80 && /\bverified\b/.test(short) && /\b(account|page|profile|badge|checkmark)\b/.test(short)) {
+          evidence.verified = true;
+        }
+        if (short.length <= 40 && /\btrending\b/.test(short)) evidence.trending = true;
+      }
+      if (el.childElementCount === 0 && !this.inMessage(el, post) && !(el.closest && el.closest('button, [role="button"]'))) {
+        const leaf = this.cleanText(el).toLowerCase();
+        if (leaf && leaf.length <= 40 && labelSet[leaf]) evidence.labels.push(leaf);
+      }
+    }
+
+    evidence.engagement = this.engagementTotal(post);
+    return evidence;
+  }
+
+  regionText(region) {
+    const clone = region.cloneNode(true);
+    const nested = clone.querySelectorAll('[role="article"]');
+    for (let i = 0; i < nested.length; i++) {
+      if (nested[i] !== clone) nested[i].parentNode.removeChild(nested[i]);
+    }
+    const skipped = clone.querySelectorAll('[data-comment-region], [contenteditable="true"]');
+    for (let i = 0; i < skipped.length; i++) {
+      if (skipped[i].parentNode) skipped[i].parentNode.removeChild(skipped[i]);
+    }
+    return this.cleanText(clone);
+  }
+
+  publicFigureLabels() {
+    return {
+      'public figure': true,
+      'politician': true,
+      'government official': true,
+      'actor': true,
+      'actress': true,
+      'musician': true,
+      'musician/band': true,
+      'athlete': true,
+      'comedian': true,
+      'model': true,
+      'tv personality': true,
+      'television personality': true,
+      'news personality': true,
+      'journalist': true
+    };
+  }
+
+  inComment(el, post) {
+    let node = el;
+    while (node && node !== post) {
+      if (node.getAttribute) {
+        const label = node.getAttribute('aria-label') || '';
+        if (/^comments?(\b| by)/i.test(label)) return true;
+        if (node.hasAttribute('data-comment-region')) return true;
+        if (node.getAttribute('contenteditable') === 'true') return true;
+      }
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  inMessage(el, post) {
+    const message = el.closest && el.closest('[data-ad-preview="message"]');
+    return !!(message && message !== post);
+  }
+
+  cleanText(el) {
+    return (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  isPageHref(href) {
+    return href.indexOf('/pages/') !== -1 || href.indexOf('/pg/') !== -1 || href.indexOf('/page/') !== -1;
+  }
+
+  isGroupHref(href) {
+    return href.indexOf('/groups/') !== -1;
+  }
+
+  engagementTotal(post) {
+    let total = 0;
+    const nodes = post.querySelectorAll('[aria-label]');
+    for (let i = 0; i < nodes.length; i++) {
+      if (this.inComment(nodes[i], post)) continue;
+      const label = nodes[i].getAttribute('aria-label') || '';
+      const match = label.match(/([\d,]+)\s*(?:like|comment|share|people)/i);
+      if (match) total += this.parseCount(match[1]);
+    }
+    return total;
+  }
+
+  parseCount(value) {
+    if (typeof value === 'number') return value;
+    const digits = String(value || '').replace(/[^\d]/g, '');
+    if (!digits) return 0;
+    return parseInt(digits, 10);
   }
 
   hidePost(post) {
-    // Immediately hide the post (no transition for faster filtering)
+    if (post.getAttribute('data-filtered-by') === 'defamous') return;
+    post.setAttribute('data-defamous-display', post.style.display || '');
     post.style.display = 'none';
-    post.style.visibility = 'hidden';
-    post.style.height = '0';
-    post.style.overflow = 'hidden';
-    post.style.margin = '0';
-    post.style.padding = '0';
-    post.style.opacity = '0';
-    
-    // Hide all child elements too (limit to prevent performance issues)
-    const children = post.querySelectorAll('*');
-    const maxChildren = 100; // Limit to prevent performance issues
-    const childrenToHide = Array.from(children).slice(0, maxChildren);
-    childrenToHide.forEach(child => {
-      child.style.display = 'none';
-      child.style.visibility = 'hidden';
-    });
-    
-    // Add a marker so we know it's been filtered
     post.setAttribute('data-filtered-by', 'defamous');
     post.setAttribute('aria-hidden', 'true');
-    
-    // Try to remove from accessibility tree
-    try {
-      post.removeAttribute('role');
-      post.setAttribute('tabindex', '-1');
-    } catch (e) {
-      // Ignore errors
-    }
+  }
+
+  showPost(post) {
+    if (post.getAttribute('data-filtered-by') !== 'defamous') return;
+    post.style.display = post.getAttribute('data-defamous-display') || '';
+    post.removeAttribute('data-defamous-display');
+    post.removeAttribute('data-filtered-by');
+    post.removeAttribute('aria-hidden');
   }
 }
 
-// Initialize the filter when the page loads
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     new FacebookCelebrityFilter();
@@ -740,4 +490,3 @@ if (document.readyState === 'loading') {
 } else {
   new FacebookCelebrityFilter();
 }
-
