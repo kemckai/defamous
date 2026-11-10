@@ -59,3 +59,5 @@ safari/build/
 *.mobileprovision
 *.provisionprofile
 safari/Defamous/Local.xcconfig
+site/dist/
+defamous-extension.zip

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Defamous: hide celebrity posts from your Facebook feed</title>
+<meta name="description" content="Defamous is a free, privacy-first browser extension that hides public-figure posts from your Facebook feed.">
+<link rel="icon" href="icon48.png">
+<style>
+:root{--ink:#14171f;--muted:#5b6170;--line:#e3e6ec;--accent:#1f6feb;--bg:#f7f8fa}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+main{max-width:860px;margin:0 auto;padding:40px 20px 64px}
+header{display:flex;gap:16px;align-items:center}header img{width:64px;height:64px;border-radius:14px}
+h1{font-size:2rem;margin:0}h2{margin-top:2.2rem;font-size:1.25rem}
+.lead{color:var(--muted);font-size:1.1rem;margin:.25rem 0 0}
+.hero{margin:28px 0;border-radius:14px;max-width:100%;border:1px solid var(--line)}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}
+.btn{display:inline-block;padding:11px 18px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 22px}
+ol li,ul li{margin:.35rem 0}code{background:#eef1f5;padding:1px 6px;border-radius:5px}
+footer{margin-top:48px;color:var(--muted);font-size:.9rem}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <img src="icon128.png" alt="Defamous icon">
+  <div><h1>Defamous</h1><p class="lead">Hide celebrity and public-figure posts from your Facebook feed.</p></div>
+</header>
+<img class="hero" src="marquee-promo-tile.png" alt="Defamous promotional banner" width="1400" height="560">
+<p>Defamous is a free browser extension for Chrome, Edge, and Safari on macOS. It hides posts by public figures, posts and shares about them, and posts Facebook labels as “Public figure”, “Actor”, “Musician”, and similar. Ordinary posts from friends stay put.</p>
+<div class="btns">
+  <a class="btn" href="defamous-extension.zip" download>Download for Chrome / Edge (.zip)</a>
+  <a class="btn alt" href="https://github.com/kemckai/defamous">Source on GitHub</a>
+  <a class="btn alt" href="privacy-policy.html">Privacy policy</a>
+</div>
+<h2>Install in Chrome or Edge</h2>
+<div class="card"><ol>
+  <li>Download <code>defamous-extension.zip</code> above and unzip it.</li>
+  <li>Open <code>chrome://extensions</code> (or <code>edge://extensions</code>).</li>
+  <li>Turn on <strong>Developer mode</strong> in the top-right corner.</li>
+  <li>Click <strong>Load unpacked</strong> and choose the unzipped folder.</li>
+  <li>Open Facebook, click the Defamous icon in the toolbar, and pick your filters.</li>
+</ol></div>
+<p>A Chrome Web Store listing is planned. Safari users can build the macOS wrapper from the <a href="https://github.com/kemckai/defamous/tree/main/safari">safari folder</a> in the repository.</p>
+<h2>What it hides</h2>
+<ul>
+  <li>Posts whose author matches a built-in public-figure name or a name you add.</li>
+  <li>Captions, photo labels, and shares that name one of those people, including a friend passing the post along.</li>
+  <li>Headers whose Facebook category is exactly “Public figure”, “Actor”, “Musician”, “Athlete”, and similar.</li>
+  <li>Optional, off by default: every verified account, high-engagement posts, posts shared from Pages or Groups, and Trending.</li>
+</ul>
+<h2>Privacy</h2>
+<p>Everything runs in your browser. Defamous collects nothing, sends nothing, and uses no analytics. Its only permission is storage for your settings, and it runs only on facebook.com.</p>
+<footer>MIT licensed. Made by Keith McKay.</footer>
+</main>
+</body>
+</html>
